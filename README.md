@@ -7,7 +7,7 @@ To Install & Run This Project, Follow These Steps:
 1. Clone the repository:
 
     ```sh
-    git clone https://github.com/SoftVenceDev/mirko86z_backend.git
+    git clone https://github.com/Webgenius0/linzienielsen_backend.git
     ```
 
 2. Navigate to the project directory:
