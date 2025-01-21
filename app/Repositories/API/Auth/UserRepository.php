@@ -30,9 +30,8 @@ class UserRepository implements UserRepositoryInterface
         try {
             // creating user
             $user = User::create([
-                'first_name' => $credentials['first_name'],
-                'last_name' => $credentials['last_name'],
-                'handle' => Helper::generateUniqueSlug($credentials['first_name'], 'users', 'handle'),
+                'name' => $credentials['name'],
+                'handle' => Helper::generateUniqueSlug($credentials['name'], 'users', 'handle'),
                 'email' => $credentials['email'],
                 'password' => Hash::make($credentials['password']),
                 'role' => $role,

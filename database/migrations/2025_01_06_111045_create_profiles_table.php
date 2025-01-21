@@ -16,12 +16,10 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
 
             $table->enum('gender', ['male', 'female', 'others'])->nullable();
-            
-            $table->string('phone')->nullable();
-            $table->text('address')->nullable();
+
+            $table->string('country')->nullable();
 
             $table->date('date_of_birth')->nullable();
-            $table->longText('bio')->nullable();
 
             $table->timestamps();
         });
