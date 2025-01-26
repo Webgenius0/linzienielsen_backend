@@ -48,9 +48,9 @@ return Application::configure(basePath: dirname(__DIR__))
         then: function () {
             // api
             Route::middleware([])
-                ->prefix('api/auth')
+                ->prefix('api/v1/auth')
                 ->name('api.auth.')
-                ->group(base_path('routes/api/auth.php'));
+                ->group(base_path('routes/api/v1/auth.php'));
         }
     )
     ->withMiddleware(function (Middleware $middleware) {
@@ -117,7 +117,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     return Helper::error(503, 'Service Unavailable', $e->getMessage());
                 } else if (!$e instanceof ValidationException) {
                     return Helper::error($e->getCode() ?? 500, 'Error', $e->getMessage());
-                }  
+                }
             }
         });
     })->create();

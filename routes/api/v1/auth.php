@@ -43,8 +43,8 @@ Route::middleware('auth:api')->group(function () {
     });
     // OTP-related routes
     Route::controller(OTPController::class)->group(function () {
-        Route::post('/oto-send', 'otpSend')->name('otp.send');
-        Route::post('/oto-match', 'otpMatch')->name('otp.match');
+        Route::post('/otp-send', 'otpSend')->name('otp.send');
+        Route::post('/otp-match', 'otpMatch')->name('otp.match');
     });
 });
 
