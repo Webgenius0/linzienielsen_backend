@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\API\Auth\AuthController;
-use App\Http\Controllers\API\Auth\ForgerPasswordController;
-use App\Http\Controllers\API\Auth\OTPController;
-use App\Http\Controllers\API\Auth\PasswordController;
+use App\Http\Controllers\API\V1\Auth\AuthController;
+use App\Http\Controllers\API\V1\Auth\ForgerPasswordController;
+use App\Http\Controllers\API\V1\Auth\OTPController;
+use App\Http\Controllers\API\V1\Auth\PasswordController;
 use Illuminate\Support\Facades\Route;
 
 

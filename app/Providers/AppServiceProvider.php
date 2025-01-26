@@ -2,14 +2,14 @@
 
 namespace App\Providers;
 
-use App\Repositories\API\Auth\ForgetPasswordRepository;
-use App\Repositories\API\Auth\ForgetPasswordRepositoryInterface;
-use App\Repositories\API\Auth\OTPRepository;
-use App\Repositories\API\Auth\OTPRepositoryInterface;
-use App\Repositories\API\Auth\PasswordRepository;
-use App\Repositories\API\Auth\PasswordRepositoryInterface;
-use App\Repositories\API\Auth\UserRepository;
-use App\Repositories\API\Auth\UserRepositoryInterface;
+use App\Repositories\API\V1\Auth\ForgetPasswordRepository;
+use App\Repositories\API\V1\Auth\ForgetPasswordRepositoryInterface;
+use App\Repositories\API\V1\Auth\OTPRepository;
+use App\Repositories\API\V1\Auth\OTPRepositoryInterface;
+use App\Repositories\API\V1\Auth\PasswordRepository;
+use App\Repositories\API\V1\Auth\PasswordRepositoryInterface;
+use App\Repositories\API\V1\Auth\UserRepository;
+use App\Repositories\API\V1\Auth\UserRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
