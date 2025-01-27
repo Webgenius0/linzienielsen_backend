@@ -34,7 +34,7 @@ class OTPRepository implements OTPRepositoryInterface
             $user->otps()->whereOperation($operation)->delete();
 
             // Generate a new OTP
-            $otp = mt_rand(111111, 999999);
+            $otp = mt_rand(1111, 9999);
 
             // Store OTP in database
             $user->otps()->create([
@@ -78,7 +78,7 @@ class OTPRepository implements OTPRepositoryInterface
             }
 
             // Check if OTP has expired (1 minute window)
-            if ($userOtp->created_at->diffInMinutes(now()) > 1) {
+            if ($userOtp->created_at->diffInMinutes(now()) > 5) {
                 throw new OTPExpiredException();
             }
 

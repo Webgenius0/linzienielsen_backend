@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API\V1\Auth;
 
+use App\Http\Resources\API\V1\Auth\LoginResource;
+use App\Http\Resources\API\V1\Auth\RegistrationResource;
 use App\Services\API\V1\Auth\AuthService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\V1\Auth\LoginRequest;
@@ -56,8 +58,8 @@ class AuthController extends Controller
             $validatedData = $request->validated();
 
             $response = $this->authService->register($validatedData);
-
-            return $this->success(200, 'Registration Successfull', $response);
+            Log::info($response);
+            return $this->success(200, 'Registration Successfull', new RegistrationResource($response));
         } catch (Exception $e) {
             Log::error('AuthService::register', ['error' => $e->getMessage()]);
             return $this->error(500, 'Server Error', $e->getMessage());
@@ -83,7 +85,7 @@ class AuthController extends Controller
 
             $response = $this->authService->login($validatedData);
 
-            return $this->success(200, 'Login Successfull', $response);
+            return $this->success(200, 'Login Successfull', new LoginResource($response));
         } catch (Exception $e) {
             Log::error('AuthService::login', ['error' => $e->getMessage()]);
             return $this->error(500, 'Server Error', $e->getMessage());

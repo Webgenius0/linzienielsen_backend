@@ -100,4 +100,25 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(OTP::class);
     }
+
+
+        /**
+     * Get the avatar attribute.
+     *
+     * @param string|null $url The URL to be processed. Can be null or a string.
+     *
+     * @return string The processed URL. It may be modified or default to a fallback image.
+     */
+    public function getAvatarAttribute($url): string
+    {
+        if ($url) {
+            if (strpos($url, 'http://') === 0 || strpos($url, 'https://') === 0) {
+                return $url;
+            } else {
+                return asset('storage/' . $url);
+            }
+        } else {
+            return asset('assets/custom/img/user.jpg');
+        }
+    }
 }

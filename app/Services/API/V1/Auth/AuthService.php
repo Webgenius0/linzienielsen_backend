@@ -53,7 +53,7 @@ class AuthService
                 throw new Exception('Token generation failed.', 500);
             }
             DB::commit();
-            return ['token' => $token, 'role' => $user->role, 'verify' => false];
+            return ['token' => $token, 'user' => $user, 'verify' => false];
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('AuthService::register', ['error' => $e->getMessage()]);
@@ -89,7 +89,7 @@ class AuthService
                 $verify = true;
             }
 
-            return ['token' => $token, 'role' => $user->role, 'verify' => $verify];
+            return ['token' => $token, 'user' => $user, 'verify' => $verify];
         } catch (Exception $e) {
             Log::error('AuthService::login', ['error' => $e->getMessage()]);
             throw $e;
