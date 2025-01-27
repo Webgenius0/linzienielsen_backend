@@ -14,13 +14,9 @@ return new class extends Migration
         Schema::create('profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-
             $table->enum('gender', ['male', 'female', 'others'])->nullable();
-
             $table->string('country')->nullable();
-
             $table->date('date_of_birth')->nullable();
-
             $table->timestamps();
         });
     }

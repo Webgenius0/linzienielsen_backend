@@ -31,6 +31,10 @@ class RegisterRequest extends FormRequest
             'name' => "required|string",
             'email'      => "required|email|unique:users",
             'password'   => "required|confirmed",
+            'gender' => 'required|in:male,female, others',
+            'country' => 'required|string',
+            'date_of_birth' => 'required|date',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp',
         ];
     }
 
@@ -51,6 +55,18 @@ class RegisterRequest extends FormRequest
 
             'password.required'  => 'Password is required.',
             'password.confirmed' => 'Passwords do not match.',
+
+            'gender.required' => 'Gender is required.',
+            'gender.in'       => 'Gender must be one of the following: male, female, or others.',
+
+            'country.required' => 'Country is required.',
+            'country.string'   => 'Country must be a string.',
+
+            'date_of_birth.required' => 'Date of birth is required.',
+            'date_of_birth.date'     => 'Date of birth must be a valid date.',
+
+            'avatar.image'         => 'Avatar must be an image.',
+            'avatar.mimes'         => 'Avatar must be a file of type: jpeg, png, jpg, gif, svg, webp.',
         ];
     }
 
@@ -70,12 +86,16 @@ class RegisterRequest extends FormRequest
      *
      * @throws ValidationException The exception is thrown to halt further processing and return validation errors.
      */
-    protected function failedValidation(Validator $validator):never
+    protected function failedValidation(Validator $validator): never
     {
 
         $nameError = $validator->errors()->get('name') ?? null;
         $emailErrors = $validator->errors()->get('email') ?? null;
         $passwordErrors = $validator->errors()->get('password') ?? null;
+        $genderErrors = $validator->errors()->get('gender') ?? null;
+        $countryErrors = $validator->errors()->get('country') ?? null;
+        $dateOfBirthErrors = $validator->errors()->get('date_of_birth') ?? null;
+        $avatarErrors = $validator->errors()->get('avatar') ?? null;
 
         if ($nameError) {
             $message = $nameError[0];
@@ -83,6 +103,14 @@ class RegisterRequest extends FormRequest
             $message = $emailErrors[0];
         } else if ($passwordErrors) {
             $message = $passwordErrors[0];
+        } else if ($genderErrors) {
+            $message = $genderErrors[0];
+        } else if ($countryErrors) {
+            $message = $countryErrors[0];
+        } else if ($dateOfBirthErrors) {
+            $message = $dateOfBirthErrors[0];
+        } else if ($avatarErrors) {
+            $message = $avatarErrors[0];
         }
 
         $response = $this->error(

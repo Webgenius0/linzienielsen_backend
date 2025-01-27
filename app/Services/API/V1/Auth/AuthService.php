@@ -53,8 +53,6 @@ class AuthService
                 throw new Exception('Token generation failed.', 500);
             }
             DB::commit();
-
-            // return ['token' => $token, 'role' => $user->role, 'verify' => false, 'otp' => $otp];
             return ['token' => $token, 'role' => $user->role, 'verify' => false];
         } catch (Exception $e) {
             DB::rollBack();

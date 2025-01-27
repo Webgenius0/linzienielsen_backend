@@ -36,8 +36,20 @@ class UserRepository implements UserRepositoryInterface
                 'password' => Hash::make($credentials['password']),
                 'role' => $role,
             ]);
+
+            if (isset($credentials['avatar'])) {
+                $url = Helper::uploadFile($credentials['avatar'], 'user/'. $user->id);
+                $user->update([
+                    'avatar' => $url,
+                ]);
+            }
+
             // creating user profile
-            $user->profile()->create([]);
+            $user->profile()->create([
+                'gender' => $credentials['gender'],
+                'country' => $credentials['country'],
+                'date_of_birth' => $credentials['date_of_birth'],
+            ]);
             return $user;
         } catch (Exception $e) {
             Log::error('UserRepository::createUser', ['error' => $e->getMessage()]);
