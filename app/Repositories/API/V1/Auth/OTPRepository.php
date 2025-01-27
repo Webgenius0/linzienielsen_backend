@@ -10,7 +10,9 @@ use App\Exceptions\OTPExpiredException;
 use App\Exceptions\OTPMismatchException;
 use App\Exceptions\UserAlreadyVarifiedException;
 use App\Jobs\SendOTPEmail;
+use App\Mail\OTPMail;
 use Exception;
+use Illuminate\Support\Facades\Mail;
 
 class OTPRepository implements OTPRepositoryInterface
 {
@@ -42,7 +44,8 @@ class OTPRepository implements OTPRepositoryInterface
 
             // Dispatch the OTP sending email job
             $subject = $operation === 'email' ? 'Verify Email' : 'One Time Password (OTP)';
-            SendOTPEmail::dispatch($user, $otp, $subject);
+            // SendOTPEmail::dispatch($user, $otp, $subject);
+            Mail::to($user->email)->send(new OTPMail($subject, $otp, $user));
 
             return $otp;
         } catch (Exception $e) {
