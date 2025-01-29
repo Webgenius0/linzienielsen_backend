@@ -25,6 +25,7 @@ class UserSeeder extends Seeder
                 'role' => 'user',
                 'status' => true,
                 'subscribe' => false,
+                'email_verified_at' => now(),
             ],
             [
                 'name' => 'User Two',

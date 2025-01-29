@@ -2,7 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\Traits\ApiResponse;
+
+use App\Traits\V1\ApiResponse;
 use Closure;
 use Exception;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class EnsureGuestJwt
     /**
      * Handle an incoming request.
      * Check if the user is authenticated via JWT
-     * 
+     *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @return mixed

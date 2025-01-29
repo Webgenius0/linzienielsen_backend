@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('title');
-            $table->boolean('archive');
+            $table->boolean('archive')->default(false);
             $table->softDeletes();
             $table->timestamps();
         });

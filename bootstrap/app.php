@@ -52,10 +52,15 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->name('api.v1.auth.')
                 ->group(base_path('routes/api/v1/auth.php'));
 
-            Route::middleware(['auth:api'])
+            Route::middleware(['auth:api', 'verified'])
                 ->prefix('api/v1/profile')
                 ->name('api.v1.profile.')
                 ->group(base_path('routes/api/v1/profile.php'));
+
+            Route::middleware(['auth:api', 'verified'])
+                ->prefix('api/v1/journal')
+                ->name('api.v1.journal.')
+                ->group(base_path('routes/api/v1/journal.php'));
         }
     )
     ->withMiddleware(function (Middleware $middleware) {

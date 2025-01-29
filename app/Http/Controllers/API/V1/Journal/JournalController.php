@@ -24,7 +24,8 @@ class JournalController extends Controller
     {
         try {
             $validatedData = $createJournalRequest->validated();
-            $this->journalService->createJournal($validatedData);
+            $response = $this->journalService->createJournal($validatedData);
+            return $this->success(200, 'Journal Created Successfully', $response);
         } catch (Exception $e) {
             Log::error('JournalController::store', [$e->getMessage()]);
             return $this->error(500, 'Server Error', $e->getMessage());
