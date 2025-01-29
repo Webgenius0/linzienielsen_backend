@@ -15,12 +15,12 @@ class JournalService
         $this->journalRepositoryInterface = $journalRepositoryInterface;
     }
 
-    public function CreateJournal(array $credentials)
+    public function createJournal(array $credentials)
     {
         try {
-            
+
         } catch (Exception $e) {
-            Log::error('JournalService::CreateJournal', [$e->getMessage()]);
+            Log::error('JournalService::createJournal', [$e->getMessage()]);
             throw $e;
         }
     }

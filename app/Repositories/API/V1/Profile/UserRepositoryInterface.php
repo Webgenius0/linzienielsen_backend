@@ -8,7 +8,13 @@ use Illuminate\Database\Eloquent\Collection;
 interface UserRepositoryInterface
 {
 
-
+    /**
+     * Retrieve the authenticated user's basic details along with their profile.
+     *
+     * This method fetches the authenticated user with selected attributes (`id`, `name`, `avatar`)
+     * and includes related profile data (`id`, `user_id`, `gender`, `date_of_birth`, `country`).
+     * If the user is not found, it throws an exception.
+     */
     public function getAuthUser();
 
     /**
@@ -19,5 +25,4 @@ interface UserRepositoryInterface
      * @return User The updated user instance.
      */
     public function updateUserProfile(array $credentials);
-
 }
