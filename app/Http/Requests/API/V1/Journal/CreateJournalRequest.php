@@ -30,6 +30,8 @@ class CreateJournalRequest extends FormRequest
             'content' => 'required|string',
             'reminder_type' => 'required|in:daily,weekly,monthly',
             'reminder_time' => 'required|date_format:H:i',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
         ];
     }
 
