@@ -18,6 +18,16 @@ class UserService
     }
 
 
+    /**
+     * Retrieve the authenticated user's profile.
+     *
+     * This method fetches the currently authenticated user using the
+     * UserRepositoryInterface. If an exception occurs, it is logged
+     * before being rethrown.
+     *
+     * @return User|null The authenticated user's profile or null if not found.
+     * @throws Exception If an error occurs during retrieval.
+     */
     public function getProfile()
     {
         try {
