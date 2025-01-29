@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests\API\V1\Profile;
+namespace App\Http\Requests\API\V1\Journal;
 
 use App\Traits\V1\ApiResponse;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
 
-class UpdateProfileRequest extends FormRequest
+class CreateJournalRequest extends FormRequest
 {
     use ApiResponse;
     /**
@@ -26,13 +26,14 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp',
-            'gender' => 'required|in:male,female, others',
-            'country' => 'required|string',
-            'date_of_birth' => 'required|date',
+            'title' => 'required|string',
+            'content' => 'required|string',
+            'reminder_type' => 'required|in:daily,weekly,monthly',
+            'reminder_time' => 'required|date_format:H:i',
         ];
     }
+
+
 
 
     /**
@@ -43,20 +44,14 @@ class UpdateProfileRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'The name field is required.',
-            'name.string' => 'The name must be a valid string.',
-
-            'avatar.image' => 'The avatar must be an image.',
-            'avatar.mimes' => 'The avatar must be a file of type: jpeg, png, jpg, gif, svg, webp.',
-
-            'gender.required' => 'The gender field is required.',
-            'gender.in' => 'Please select a valid gender (male, female, or others).',
-
-            'country.required' => 'The country field is required.',
-            'country.string' => 'The country must be a valid string.',
-
-            'date_of_birth.required' => 'The date of birth field is required.',
-            'date_of_birth.date' => 'Please enter a valid date for the date of birth.',
+            'title.required' => 'The note title is required.',
+            'title.string' => 'The title must be a valid string.',
+            'content.required' => 'The content field cannot be empty.',
+            'content.string' => 'The content must be a valid string.',
+            'reminder_type.required' => 'Please select a reminder type (daily, weekly, or monthly).',
+            'reminder_type.in' => 'Invalid reminder type. Choose from daily, weekly, or monthly.',
+            'reminder_time.required' => 'Please specify a reminder time.',
+            'reminder_time.date_format' => 'Invalid format for reminder time. Please use HH:MM format.',
         ];
     }
 
@@ -79,7 +74,7 @@ class UpdateProfileRequest extends FormRequest
     {
         $errors = $validator->errors()->getMessages();
         $message = null;
-        $fields = ['name', 'avatar', 'gender', 'country', 'date_of_birth'];
+        $fields = ['title', 'content', 'reminder_type', 'reminder_time'];
 
         foreach ($fields as $field) {
             if (isset($errors[$field])) {

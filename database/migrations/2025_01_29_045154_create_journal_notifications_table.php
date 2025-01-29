@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('journal_id')->constrained('journals')->cascadeOnDelete();
             $table->enum('type', ['daily', 'weekly', 'monthly'])->default('daily');
+            $table->time('time');
             $table->timestamps();
         });
     }
