@@ -90,7 +90,7 @@ class UserSeeder extends Seeder
             'name' => 'Admin User',
             'handle' => 'admin123',
             'email' => 'admin@admin.com',
-            'password' => bcrypt('adminpassword'),
+            'password' => bcrypt('12345678'),
             'avatar' => 'https://thumbs.dreamstime.com/b/business-confident-portrait-girl-office-internship-as-secretary-company-admin-work-tasks-female-employee-happy-315217212.jpg',
             'role' => 'admin',
             'status' => true,
