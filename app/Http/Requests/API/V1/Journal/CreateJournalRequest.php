@@ -34,8 +34,6 @@ class CreateJournalRequest extends FormRequest
     }
 
 
-
-
     /**
      * Define the custom validation error messages.
      *
