@@ -21,22 +21,12 @@ class JournalService
 
 
     /**
-     * Create a new journal entry with associated HTML content and images.
+     * Creates a journal and processes its content, including uploading images.
      *
-     * This method accepts journal credentials, including a title and content. It creates a new journal entry
-     * for the authenticated user and associates it with a unique page containing the provided HTML content.
-     * Any images embedded within the HTML content are uploaded and stored in a designated folder,
-     * and their `src` attributes are updated to point to the stored images.
+     * @param array $credentials The data to create the journal, including title, content, and images.
      *
-     * A database transaction is used to ensure the creation of the journal entry and the associated page is atomic.
-     * If an error occurs during the process, the transaction is rolled back and the exception is re-thrown.
-     *
-     * @param array $credentials An array containing the journal's attributes:
-     *                           - 'title' (string) => The title of the journal.
-     *                           - 'content' (string) => The HTML content to be processed.
-     *                           - 'images' (array) => Array of uploaded images to be linked in the content.
-     *
-     * @throws \Exception If an error occurs during journal or image creation or processing.
+     * @return mixed The created journal page with updated content.
+     * @throws Exception If an error occurs during journal creation.
      */
     public function createJournal(array $credentials)
     {
@@ -47,64 +37,12 @@ class JournalService
             $journal = $this->journalRepositoryInterface->createJournal($credentials['title']);
             // Create the journal notification
             $this->journalRepositoryInterface->createJournalNotification($credentials, $journal->id);
-            // Get the HTML content from the request
-            $htmlContent = $credentials['content'];
 
-            // Create a new DOMDocument instance to parse the HTML
-            $dom = new DOMDocument();
-            libxml_use_internal_errors(true); // Prevents errors from malformed HTML
-            $dom->loadHTML($htmlContent); // Load the content directly, no need to wrap with <html> and <body>
-            libxml_clear_errors(); // Clear any libxml errors
-
-            // Find all <img> tags in the HTML
-            $images = $dom->getElementsByTagName('img');
-
-            // Check if there are multiple images uploaded
-            if ($credentials['images'] && is_array($credentials['images'])) {
-                $uploadedImages = $credentials['images']; // Assuming 'images' is the array of files uploaded
-                $imageIndex = 0; // Index to keep track of which image we're processing
-                $totalImages = count($uploadedImages); // Total number of images
-
-                // Loop through each <img> tag and each uploaded image
-                foreach ($images as $img) {
-                    // If we still have images left to upload
-                    if ($imageIndex < $totalImages) {
-                        // Get the current image file
-                        $file = $uploadedImages[$imageIndex];
-
-                        // Store the image in the desired path
-                        if ($file && $file instanceof UploadedFile) {
-                            // Store the image in the journal's folder
-                            $imageName = $file->store('journal/' . $journal->id, 'public');
-
-                            // Update the image src in the HTML content
-                            $img->setAttribute('src', asset('storage/' . $imageName));
-
-                            // Move to the next image in the array
-                            $imageIndex++;
-                        }
-                    }
-                }
-            }
-
-            // After processing all images, get the content inside the <body> tag directly
-            $updatedHtmlContent = '';
-            foreach ($dom->documentElement->childNodes as $node) {
-                // Append only the body content, without <html> and <body> tags
-                if ($node->nodeName === 'body') {
-                    foreach ($node->childNodes as $child) {
-                        $updatedHtmlContent .= $dom->saveHTML($child);
-                    }
-                }
-            }
-            // Replace escaped double quotes with single quotes in the `src` attributes
-            $updatedHtmlContent = preg_replace('/src=\\"(.*?)\\"/', "src='$1'", $updatedHtmlContent);
-
-            // Remove unwanted newline characters from the HTML content
-            $updatedHtmlContent = str_replace(["\n", "\r", "\t"], '', $updatedHtmlContent);
+            // Get and process the HTML content
+            $htmlContent = $this->processHtmlContent($credentials['content'], $credentials['images'], $journal->id);
 
             // Create a new journal page with the updated HTML content
-            $journalWithPage = $this->journalRepositoryInterface->createJournalPage($updatedHtmlContent, $journal->id);
+            $journalWithPage = $this->journalRepositoryInterface->createJournalPage($htmlContent, $journal->id);
 
             // Commit the transaction
             DB::commit();
@@ -115,5 +53,105 @@ class JournalService
             Log::error('JournalService::createJournal', [$e->getMessage()]);
             throw $e;
         }
+    }
+
+
+    /**
+     * Processes the HTML content, including replacing image sources with uploaded images.
+     *
+     * @param string $htmlContent The HTML content to be processed.
+     * @param array $uploadedImages The array of uploaded images.
+     * @param int $journalId The ID of the journal.
+     *
+     * @return string The updated HTML content with processed images and replaced attributes.
+     */
+    private function processHtmlContent(string $htmlContent, array $uploadedImages, int $journalId): string
+    {
+        // Create a new DOMDocument instance to parse the HTML
+        $dom = new DOMDocument();
+        libxml_use_internal_errors(true); // Prevents errors from malformed HTML
+        $dom->loadHTML($htmlContent); // Load the content directly, no need to wrap with <html> and <body>
+        libxml_clear_errors(); // Clear any libxml errors
+
+        // Replace image sources with uploaded images
+        $this->processImagesInHtml($dom, $uploadedImages, $journalId);
+
+        // After processing all images, get the content inside the <body> tag directly
+        $updatedHtmlContent = $this->extractBodyContent($dom);
+
+        // Replace escaped double quotes with single quotes in the `src` attributes
+        return $this->replaceDoubleQuotesWithSingle($updatedHtmlContent);
+    }
+
+
+    /**
+     * Processes the <img> tags in the HTML and replaces their 'src' attribute with the uploaded image paths.
+     *
+     * @param DOMDocument $dom The DOMDocument instance containing the HTML content.
+     * @param array $uploadedImages The array of uploaded images.
+     * @param int $journalId The ID of the journal.
+     */
+    private function processImagesInHtml(DOMDocument $dom, array $uploadedImages, int $journalId): void
+    {
+        $images = $dom->getElementsByTagName('img');
+        $imageIndex = 0;
+        $totalImages = count($uploadedImages);
+
+        // Loop through each <img> tag and each uploaded image
+        foreach ($images as $img) {
+            if ($imageIndex < $totalImages) {
+                // Get the current image file
+                $file = $uploadedImages[$imageIndex];
+
+                if ($file && $file instanceof UploadedFile) {
+                    // Store the image in the journal's folder
+                    $imageName = $file->store('journal/' . $journalId, 'public');
+
+                    // Update the image src in the HTML content
+                    $img->setAttribute('src', asset('storage/' . $imageName));
+
+                    // Move to the next image in the array
+                    $imageIndex++;
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Extracts and returns the content inside the <body> tag from the DOMDocument.
+     *
+     * @param DOMDocument $dom The DOMDocument instance containing the HTML content.
+     *
+     * @return string The extracted body content as a string.
+     */
+    private function extractBodyContent(DOMDocument $dom): string
+    {
+        $updatedHtmlContent = '';
+        foreach ($dom->documentElement->childNodes as $node) {
+            if ($node->nodeName === 'body') {
+                foreach ($node->childNodes as $child) {
+                    $updatedHtmlContent .= $dom->saveHTML($child);
+                }
+            }
+        }
+        return $updatedHtmlContent;
+    }
+
+
+    /**
+     * Replaces escaped double quotes in the src attribute with single quotes and removes unnecessary whitespace.
+     *
+     * @param string $htmlContent The HTML content to be processed.
+     *
+     * @return string The updated HTML content with replaced quotes and removed whitespace.
+     */
+    private function replaceDoubleQuotesWithSingle(string $htmlContent): string
+    {
+        // Replace escaped double quotes with single quotes in the `src` attributes
+        $htmlContent = preg_replace('/src=\\"(.*?)\\"/', "src='$1'", $htmlContent);
+
+        // Remove unwanted newline characters from the HTML content
+        return str_replace(["\n", "\r", "\t"], '', $htmlContent);
     }
 }
