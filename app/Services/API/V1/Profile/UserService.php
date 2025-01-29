@@ -18,6 +18,16 @@ class UserService
     }
 
 
+    public function getProfile()
+    {
+        try {
+            return $this->userRepositoryInterface->getAuthUser();
+        } catch (Exception $e) {
+            Log::error("UserService:updateProfile", [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
     /**
      * Update the user's profile information.
      *

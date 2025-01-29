@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Collection;
 interface UserRepositoryInterface
 {
 
+
+    public function getAuthUser():Collection;
+
     /**
      * Update the user's profile information, including their name, handle, profile data, and avatar.
      * If the user profile does not exist, it will be created.

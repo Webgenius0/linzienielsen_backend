@@ -18,6 +18,24 @@ class UserRepository implements UserRepositoryInterface
         $this->user = Auth::user();
     }
 
+
+    public function getAuthUser(): Collection
+    {
+        try {
+            $user = User::select('name', 'avatar')->with([
+                'profile' => function ($query) {
+                    $query->select('gender', 'date_of_birth', 'country', 'user_id');  // Select specific columns from Profile
+                }
+            ])->findOrFail($this->user->id);
+            
+            return $user;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error("UserRepository::getAuthUser", [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
     /**
      * Update the user's profile information, including their name, handle, profile data, and avatar.
      * If the user profile does not exist, it will be created.

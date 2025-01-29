@@ -23,6 +23,18 @@ class UserController extends Controller
     }
 
 
+    public function show():JsonResponse
+    {
+        try {
+            $response = $this->userService->getProfile();
+            return $this->success(200, "User Profile", new ProfileResource($response));
+        }catch(Exception $e) {
+            Log::error("UserController::show", [$e->getMessage()]);
+            return $this->error(500, 'Server Error', $e->getMessage());
+        }
+    }
+
+
     public function update(UpdateProfileRequest $updateProfileRequest):JsonResponse
     {
         try {
