@@ -9,7 +9,7 @@ interface UserRepositoryInterface
 {
 
 
-    public function getAuthUser():Collection;
+    public function getAuthUser();
 
     /**
      * Update the user's profile information, including their name, handle, profile data, and avatar.
@@ -18,6 +18,6 @@ interface UserRepositoryInterface
      * @param array $credentials The profile data to update (name, handle, gender, country, date_of_birth, avatar).
      * @return User The updated user instance.
      */
-    public function updateUserProfile(array $credentials):Collection;
+    public function updateUserProfile(array $credentials);
 
 }

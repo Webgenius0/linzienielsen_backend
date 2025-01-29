@@ -19,15 +19,15 @@ class UserRepository implements UserRepositoryInterface
     }
 
 
-    public function getAuthUser(): Collection
+    public function getAuthUser()
     {
         try {
-            $user = User::select('name', 'avatar')->with([
+            $user = User::select('id','name', 'avatar')->with([
                 'profile' => function ($query) {
-                    $query->select('gender', 'date_of_birth', 'country', 'user_id');  // Select specific columns from Profile
+                    $query->select('id', 'user_id', 'gender', 'date_of_birth', 'country', 'user_id');  // Select specific columns from Profile
                 }
             ])->findOrFail($this->user->id);
-            
+
             return $user;
         } catch (Exception $e) {
             DB::rollBack();
@@ -41,10 +41,9 @@ class UserRepository implements UserRepositoryInterface
      * If the user profile does not exist, it will be created.
      *
      * @param array $credentials The profile data to update (name, handle, gender, country, date_of_birth, avatar).
-     * @return User The updated user instance.
      * @throws Exception If an error occurs during the update process, the transaction is rolled back.
      */
-    public function updateUserProfile(array $credentials): Collection
+    public function updateUserProfile(array $credentials)
     {
         try {
             $user = User::findOrFail($this->user->id);

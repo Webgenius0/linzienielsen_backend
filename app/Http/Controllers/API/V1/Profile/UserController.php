@@ -27,6 +27,7 @@ class UserController extends Controller
     {
         try {
             $response = $this->userService->getProfile();
+            Log::info($response);
             return $this->success(200, "User Profile", new ProfileResource($response));
         }catch(Exception $e) {
             Log::error("UserController::show", [$e->getMessage()]);

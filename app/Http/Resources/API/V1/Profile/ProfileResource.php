@@ -14,13 +14,12 @@ class ProfileResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $data = is_array($this->resource) ? $this->resource : (array)$this->resource;
         return [
-            'name' => $data['name'] ?? null,
-            'avatar' => $data['avatar'] ?? null,
-            'gender' => $data['gender'] ?? null,
-            'country' => $data['country'] ?? null,
-            'date_of_birth' => $data['date_of_birth'] ?? null,
+            'name' => $this->resource['name'] ?? null,
+            'avatar' => $this->resource['avatar'] ?? null,
+            'gender' => $this->resource['profile']['gender'] ?? null, // Fixed the error here
+            'country' => $this->resource['profile']['country'] ?? null,
+            'date_of_birth' => $this->resource['profile']['date_of_birth'] ?? null, // Corrected this too
         ];
     }
 }
