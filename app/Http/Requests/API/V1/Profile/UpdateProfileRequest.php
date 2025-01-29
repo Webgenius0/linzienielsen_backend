@@ -9,7 +9,6 @@ use Illuminate\Validation\ValidationException;
 
 class UpdateProfileRequest extends FormRequest
 {
-
     use ApiResponse;
     /**
      * Determine if the user is authorized to make this request.
