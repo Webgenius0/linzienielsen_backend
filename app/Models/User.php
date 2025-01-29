@@ -86,7 +86,7 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(Profile::class);
     }
 
-        /**
+    /**
      * Define the relationship between the current model and the Otp model.
      *
      * This method defines a "has many" relationship, where the current model
@@ -101,10 +101,18 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(OTP::class);
     }
 
-    
+    /**
+     * Get all journals associated with this model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function journals(): HasMany
+    {
+        return $this->hasMany(Journal::class);
+    }
 
 
-        /**
+    /**
      * Get the avatar attribute.
      *
      * @param string|null $url The URL to be processed. Can be null or a string.

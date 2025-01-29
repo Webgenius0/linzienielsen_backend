@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Journal extends Model
 {
@@ -33,5 +35,25 @@ class Journal extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Define the relationship between the current model and the JournalPage model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function JournalPages():HasMany
+    {
+        return $this->hasMany(JournalPage::class);
+    }
+
+    /**
+     * Define the relationship between the current model and the JournalNotification model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function journalNotification():HasOne
+    {
+        return $this->hasOne(JournalNotification::class);
     }
 }
