@@ -58,7 +58,7 @@ class AuthController extends Controller
             $validatedData = $request->validated();
 
             $response = $this->authService->register($validatedData);
-            Log::info($response);
+            // Log::info($response);
             return $this->success(200, 'Registration Successfull', new RegistrationResource($response));
         } catch (Exception $e) {
             Log::error('AuthService::register', ['error' => $e->getMessage()]);
