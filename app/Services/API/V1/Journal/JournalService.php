@@ -45,7 +45,8 @@ class JournalService
 
             // Create the journal entry
             $journal = $this->journalRepositoryInterface->createJournal($credentials['title']);
-
+            // Create the journal notification
+            $this->journalRepositoryInterface->createJournalNotification($credentials, $journal->id);
             // Get the HTML content from the request
             $htmlContent = $credentials['content'];
 

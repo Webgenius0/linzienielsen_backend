@@ -3,6 +3,7 @@
 namespace App\Repositories\API\V1\Journal;
 
 use App\Models\Journal;
+use App\Models\JournalNotification;
 use App\Models\JournalPage;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -39,7 +40,17 @@ class JournalRepository implements JournalRepositoryInterface
         }
     }
 
-
+    /**
+     * Creates a new journal page for the given journal and content.
+     *
+     * This method creates a new `JournalPage` record associated with the provided `journalId`
+     * and the given `content`. After successfully creating the journal page, it returns the
+     * associated `Journal` model, including its related `JournalPages`.
+     *
+     * @param string $content The content of the journal page.
+     * @param int $journalId The ID of the journal to which the page belongs.
+     * @throws \Exception If there is an error during the creation process.
+     */
     public function createJournalPage(string $content, int $journalId)
     {
         try {
@@ -48,9 +59,26 @@ class JournalRepository implements JournalRepositoryInterface
                 'content' => $content,
             ]);
 
-            return Journal::with('JournalPages')->findOrFail($journalId);
+            return Journal::with(['JournalPages', 'journalNotification'])->findOrFail($journalId);
         } catch (Exception $e) {
             Log::error('JournalRepository::createJournal', [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
+
+    public function createJournalNotification(array $credentials, int $journalId)
+    {
+        try {
+            JournalNotification::create([
+                'journal_id' => $journalId,
+                'type' => $credentials['reminder_type'],
+                'time' => $credentials['reminder_time'],
+            ]);
+
+            return Journal::with('JournalPages')->findOrFail($journalId);
+        } catch (Exception $e) {
+            Log::error('JournalRepository::createJournalNotification', [$e->getMessage()]);
             throw $e;
         }
     }

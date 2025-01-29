@@ -15,6 +15,19 @@ interface JournalRepositoryInterface
      */
     public function createJournal(string $title);
 
-
+    /**
+     * Creates a new journal page for the given journal and content.
+     *
+     * This method creates a new `JournalPage` record associated with the provided `journalId`
+     * and the given `content`. After successfully creating the journal page, it returns the
+     * associated `Journal` model, including its related `JournalPages`.
+     *
+     * @param string $content The content of the journal page.
+     * @param int $journalId The ID of the journal to which the page belongs.
+     * @throws \Exception If there is an error during the creation process.
+     */
     public function createJournalPage(string $content, int $journalId);
+
+
+    public function createJournalNotification(array $credentials, int $journalId);
 }
