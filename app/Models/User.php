@@ -101,6 +101,8 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(OTP::class);
     }
 
+    
+
 
         /**
      * Get the avatar attribute.

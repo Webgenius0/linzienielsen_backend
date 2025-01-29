@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->enum('role', ['user', 'admin'])->default('user');
             $table->boolean('status')->default(true);
-
+            $table->boolean('subscribe')->default(false);
             $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();
