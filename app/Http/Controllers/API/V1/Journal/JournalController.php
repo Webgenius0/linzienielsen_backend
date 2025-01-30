@@ -7,7 +7,6 @@ use App\Http\Requests\API\V1\Journal\CreateJournalRequest;
 use App\Services\API\V1\Journal\JournalService;
 use App\Traits\V1\ApiResponse;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class JournalController extends Controller
