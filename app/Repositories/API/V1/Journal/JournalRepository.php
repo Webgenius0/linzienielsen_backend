@@ -60,7 +60,9 @@ class JournalRepository implements JournalRepositoryInterface
                 'content' => $content,
             ]);
 
-            return Journal::with(['JournalPages', 'journalNotification'])->findOrFail($journalId);
+            return Journal::with(['journalNotification', 'JournalPages' => function ($query) {
+                $query->latest()->limit(1);
+            }])->findOrFail($journalId);
         } catch (Exception $e) {
             Log::error('JournalRepository::createJournal', [$e->getMessage()]);
             throw $e;
@@ -108,8 +110,8 @@ class JournalRepository implements JournalRepositoryInterface
                 ->first();
 
             $newPageNumber = JournalPage::latest('id')
-            ->first();
-            return $lastJournalPage ? $lastJournalPage->id + 1 : $newPageNumber +1;
+                ->first();
+            return $lastJournalPage ? $lastJournalPage->id + 1 : $newPageNumber + 1;
         } catch (Exception $e) {
             Log::error('JournalRepository::lastPageOfJournal', [$e->getMessage()]);
             throw $e;

@@ -24,6 +24,7 @@ class JournalPageController extends Controller
     {
         try {
             $validatedData = $createJournalPageRequest->validated();
+            Log::info($validatedData);
             $response = $this->journalService->createJournalPage($validatedData);
             return $this->success(200, 'Journal Page Created Successfully', $response);
         }catch(Exception $e) {

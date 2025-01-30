@@ -2,12 +2,14 @@
 
 namespace App\Http\Requests\API\V1\Journal;
 
+use App\Traits\V1\ApiResponse;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
 
 class CreateJournalPageRequest extends FormRequest
 {
+    use ApiResponse;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -26,7 +28,7 @@ class CreateJournalPageRequest extends FormRequest
         return [
             'journal_id' => 'required|exists:journals,id',
             'content' => 'required|string',
-            '' => 'nullable|array',
+            'images' => 'nullable|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp',
         ];
     }

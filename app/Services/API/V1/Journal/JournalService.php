@@ -61,14 +61,14 @@ class JournalService
         try {
             DB::beginTransaction();
 
-            $response = $this->processHtmlContent($credentials['content'], $credentials['images'], $credentials['jouranl_id']);
+            $response = $this->processHtmlContent($credentials['content'], $credentials['images'], $credentials['journal_id']);
 
             // Get and process the HTML content
             $htmlContent = $response[0];
             $imageUrl = $response[1];
 
             // Create a new journal page with the updated HTML content
-            $journalWithPage = $this->createPage($htmlContent, $imageUrl, $credentials['jouranl_id']);
+            $journalWithPage = $this->createPage($htmlContent, $imageUrl, $credentials['journal_id']);
             DB::commit();
 
             return $journalWithPage;
