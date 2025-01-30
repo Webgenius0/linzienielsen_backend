@@ -69,7 +69,13 @@ class JournalRepository implements JournalRepositoryInterface
         }
     }
 
-
+    /**
+     * Create a journal notification based on provided credentials and journal ID.
+     *
+     * @param array $credentials The reminder credentials (type and time).
+     * @param int $journalId The ID of the journal for which the notification is created.
+     * @throws \Exception If an error occurs during the creation of the notification.
+     */
     public function createJournalNotification(array $credentials, int $journalId)
     {
         try {
@@ -87,6 +93,13 @@ class JournalRepository implements JournalRepositoryInterface
     }
 
 
+    /**
+     * Save an image URL associated with a journal page.
+     *
+     * @param string $url The URL of the image.
+     * @param int $page_id The ID of the journal page where the image will be saved.
+     * @throws \Exception If an error occurs during the saving of the image.
+     */
     public function saveJournalImage(string $url, int $page_id)
     {
         try {
@@ -101,6 +114,12 @@ class JournalRepository implements JournalRepositoryInterface
     }
 
 
+    /**
+     * Get the next page number for a journal.
+     *
+     * @param int $journalId The ID of the journal.
+     * @throws \Exception If an error occurs during the retrieval of the next page.
+     */
     public function nextPageOfJournal(int $journalId)
     {
         try {
