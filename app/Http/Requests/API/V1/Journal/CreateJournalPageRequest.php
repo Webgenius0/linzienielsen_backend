@@ -24,7 +24,10 @@ class CreateJournalPageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'journal_id' => 'required|exists:journals,id',
+            'content' => 'required|string',
+            '' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp',
         ];
     }
 
@@ -37,14 +40,13 @@ class CreateJournalPageRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.required' => 'The note title is required.',
-            'title.string' => 'The title must be a valid string.',
-            'content.required' => 'The content field cannot be empty.',
+            'journal_id.required' => 'The journal ID field is required.',
+            'journal_id.exists' => 'The selected journal ID does not exist in our records.',
+            'content.required' => 'Please provide content for the journal entry.',
             'content.string' => 'The content must be a valid string.',
-            'reminder_type.required' => 'Please select a reminder type (daily, weekly, or monthly).',
-            'reminder_type.in' => 'Invalid reminder type. Choose from daily, weekly, or monthly.',
-            'reminder_time.required' => 'Please specify a reminder time.',
-            'reminder_time.date_format' => 'Invalid format for reminder time. Please use HH:MM format.',
+            'images.array' => 'The images field must be an array.',
+            'images.*.image' => 'Each image must be a valid image file.',
+            'images.*.mimes' => 'Each image must be of type: jpeg, png, jpg, gif, svg, or webp.',
         ];
     }
 
@@ -67,7 +69,7 @@ class CreateJournalPageRequest extends FormRequest
     {
         $errors = $validator->errors()->getMessages();
         $message = null;
-        $fields = ['title', 'content', 'reminder_type', 'reminder_time'];
+        $fields = ['journal_id', 'content', 'images'];
 
         foreach ($fields as $field) {
             if (isset($errors[$field])) {

@@ -31,7 +31,7 @@ class CreateJournalRequest extends FormRequest
             'reminder_type' => 'required|in:daily,weekly,monthly',
             'reminder_time' => 'required|date_format:H:i',
             'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp',
         ];
     }
 
@@ -52,6 +52,10 @@ class CreateJournalRequest extends FormRequest
             'reminder_type.in' => 'Invalid reminder type. Choose from daily, weekly, or monthly.',
             'reminder_time.required' => 'Please specify a reminder time.',
             'reminder_time.date_format' => 'Invalid format for reminder time. Please use HH:MM format.',
+            'images.array' => 'The images field must be an array.',
+            'images.*.image' => 'Each image must be a valid image file.',
+            'images.*.mimes' => 'Each image must be of type: jpeg, png, jpg, gif, svg, or webp.',
+
         ];
     }
 
@@ -74,7 +78,7 @@ class CreateJournalRequest extends FormRequest
     {
         $errors = $validator->errors()->getMessages();
         $message = null;
-        $fields = ['title', 'content', 'reminder_type', 'reminder_time'];
+        $fields = ['title', 'content', 'reminder_type', 'reminder_time', 'image'];
 
         foreach ($fields as $field) {
             if (isset($errors[$field])) {
