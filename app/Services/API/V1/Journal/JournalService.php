@@ -47,7 +47,7 @@ class JournalService
             $journalWithPageArray = json_decode($journalWithPage, true);
             $pageId = $journalWithPageArray['journal_pages'][0]['id'];
 
-            foreach($imageUrl as $url){
+            foreach ($imageUrl as $url) {
                 $this->journalRepositoryInterface->saveJournalImage($url, $pageId);
             }
             // Commit the transaction
@@ -72,20 +72,25 @@ class JournalService
      */
     private function processHtmlContent(string $htmlContent, array $uploadedImages, int $journalId)
     {
-        // Create a new DOMDocument instance to parse the HTML
-        $dom = new DOMDocument();
-        libxml_use_internal_errors(true); // Prevents errors from malformed HTML
-        $dom->loadHTML($htmlContent); // Load the content directly, no need to wrap with <html> and <body>
-        libxml_clear_errors(); // Clear any libxml errors
+        try {
+            // Create a new DOMDocument instance to parse the HTML
+            $dom = new DOMDocument();
+            libxml_use_internal_errors(true); // Prevents errors from malformed HTML
+            $dom->loadHTML($htmlContent); // Load the content directly, no need to wrap with <html> and <body>
+            libxml_clear_errors(); // Clear any libxml errors
 
-        // Replace image sources with uploaded images
-        $imageurl = $this->processImagesInHtml($dom, $uploadedImages, $journalId);
+            // Replace image sources with uploaded images
+            $imageurl = $this->processImagesInHtml($dom, $uploadedImages, $journalId);
 
-        // After processing all images, get the content inside the <body> tag directly
-        $updatedHtmlContent = $this->extractBodyContent($dom);
+            // After processing all images, get the content inside the <body> tag directly
+            $updatedHtmlContent = $this->extractBodyContent($dom);
 
-        // Replace escaped double quotes with single quotes in the `src` attributes
-        return [$this->replaceDoubleQuotesWithSingle($updatedHtmlContent), $imageurl];
+            // Replace escaped double quotes with single quotes in the `src` attributes
+            return [$this->replaceDoubleQuotesWithSingle($updatedHtmlContent), $imageurl];
+        } catch (Exception $e) {
+            Log::error('JournalService::processHtmlContent', [$e->getMessage()]);
+            throw $e;
+        }
     }
 
 
@@ -98,32 +103,37 @@ class JournalService
      */
     private function processImagesInHtml(DOMDocument $dom, array $uploadedImages, int $journalId)
     {
-        $images = $dom->getElementsByTagName('img');
-        $imageIndex = 0;
-        $totalImages = count($uploadedImages);
+        try {
+            $images = $dom->getElementsByTagName('img');
+            $imageIndex = 0;
+            $totalImages = count($uploadedImages);
 
-        $imageUrl = [];
+            $imageUrl = [];
 
-        // Loop through each <img> tag and each uploaded image
-        foreach ($images as $img) {
-            if ($imageIndex < $totalImages) {
-                // Get the current image file
-                $file = $uploadedImages[$imageIndex];
+            // Loop through each <img> tag and each uploaded image
+            foreach ($images as $img) {
+                if ($imageIndex < $totalImages) {
+                    // Get the current image file
+                    $file = $uploadedImages[$imageIndex];
 
-                if ($file && $file instanceof UploadedFile) {
-                    // Store the image in the journal's folder
-                    $imageName = $file->store('journal/' . $journalId, 'public');
+                    if ($file && $file instanceof UploadedFile) {
+                        // Store the image in the journal's folder
+                        $imageName = $file->store('journal/' . $journalId, 'public');
 
-                    // Update the image src in the HTML content
-                    $img->setAttribute('src', asset('storage/' . $imageName));
-                    $imageUrl[] = $imageName;
+                        // Update the image src in the HTML content
+                        $img->setAttribute('src', asset('storage/' . $imageName));
+                        $imageUrl[] = $imageName;
 
-                    // Move to the next image in the array
-                    $imageIndex++;
+                        // Move to the next image in the array
+                        $imageIndex++;
+                    }
                 }
             }
+            return $imageUrl;
+        } catch (Exception $e) {
+            Log::error('JournalService::processImagesInHtml', [$e->getMessage()]);
+            throw $e;
         }
-        return $imageUrl;
     }
 
 
@@ -136,15 +146,20 @@ class JournalService
      */
     private function extractBodyContent(DOMDocument $dom): string
     {
-        $updatedHtmlContent = '';
-        foreach ($dom->documentElement->childNodes as $node) {
-            if ($node->nodeName === 'body') {
-                foreach ($node->childNodes as $child) {
-                    $updatedHtmlContent .= $dom->saveHTML($child);
+        try {
+            $updatedHtmlContent = '';
+            foreach ($dom->documentElement->childNodes as $node) {
+                if ($node->nodeName === 'body') {
+                    foreach ($node->childNodes as $child) {
+                        $updatedHtmlContent .= $dom->saveHTML($child);
+                    }
                 }
             }
+            return $updatedHtmlContent;
+        } catch (Exception $e) {
+            Log::error('JournalService::extractBodyContent', [$e->getMessage()]);
+            throw $e;
         }
-        return $updatedHtmlContent;
     }
 
 
@@ -157,10 +172,12 @@ class JournalService
      */
     private function replaceDoubleQuotesWithSingle(string $htmlContent): string
     {
-        // Replace escaped double quotes with single quotes in the `src` attributes
-        $htmlContent = preg_replace('/src=\\"(.*?)\\"/', "src='$1'", $htmlContent);
-
-        // Remove unwanted newline characters from the HTML content
-        return str_replace(["\n", "\r", "\t"], '', $htmlContent);
+        try {
+            $htmlContent = preg_replace('/src=\\"(.*?)\\"/', "src='$1'", $htmlContent);
+            return str_replace(["\n", "\r", "\t"], '', $htmlContent);
+        } catch (Exception $e) {
+            Log::error('JournalService::replaceDoubleQuotesWithSingle', [$e->getMessage()]);
+            throw $e;
+        }
     }
 }

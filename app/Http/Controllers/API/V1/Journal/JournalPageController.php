@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\API\V1\Journal;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\API\V1\Journal\CreateJournalPageRequest;
 use App\Services\API\V1\Journal\JournalService;
 use App\Traits\V1\ApiResponse;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class JournalPageController extends Controller
 {
@@ -17,8 +20,13 @@ class JournalPageController extends Controller
     }
 
 
-    public function store()
+    public function store(CreateJournalPageRequest $createJournalPageRequest)
     {
+        try {
 
+        }catch(Exception $e) {
+            Log::error('JournalService::processImagesInHtml', [$e->getMessage()]);
+            
+        }
     }
 }
