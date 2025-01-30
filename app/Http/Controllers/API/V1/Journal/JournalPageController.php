@@ -23,10 +23,12 @@ class JournalPageController extends Controller
     public function store(CreateJournalPageRequest $createJournalPageRequest)
     {
         try {
-
+            $validatedData = $createJournalPageRequest->validated();
+            $response = $this->journalService->createJournalPage($validatedData);
+            return $this->success(200, 'Journal Page Created Successfully', $response);
         }catch(Exception $e) {
             Log::error('JournalService::processImagesInHtml', [$e->getMessage()]);
-            
+            $this->error(500, 'Server Error', $e->getMessage());
         }
     }
 }

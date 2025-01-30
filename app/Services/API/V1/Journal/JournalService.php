@@ -43,13 +43,7 @@ class JournalService
             $imageUrl = $response[1];
 
             // Create a new journal page with the updated HTML content
-            $journalWithPage = $this->journalRepositoryInterface->createJournalPage($htmlContent, $journal->id);
-            $journalWithPageArray = json_decode($journalWithPage, true);
-            $pageId = $journalWithPageArray['journal_pages'][0]['id'];
-
-            foreach ($imageUrl as $url) {
-                $this->journalRepositoryInterface->saveJournalImage($url, $pageId);
-            }
+            $journalWithPage = $this->createPage($htmlContent, $imageUrl, $journal->id);
             // Commit the transaction
             DB::commit();
 
@@ -58,6 +52,48 @@ class JournalService
             DB::rollBack();
             Log::error('JournalService::createJournal', [$e->getMessage()]);
             throw $e;
+        }
+    }
+
+
+    public function createJournalPage(array $credentials)
+    {
+        try {
+            DB::beginTransaction();
+
+            $response = $this->processHtmlContent($credentials['content'], $credentials['images'], $credentials['jouranl_id']);
+
+            // Get and process the HTML content
+            $htmlContent = $response[0];
+            $imageUrl = $response[1];
+
+            // Create a new journal page with the updated HTML content
+            $journalWithPage = $this->createPage($htmlContent, $imageUrl, $credentials['jouranl_id']);
+            DB::commit();
+
+            return $journalWithPage;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('JournalService::createJournalPage', [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
+
+    public function createPage(string $htmlContent, array $imageUrl, int $jouranlId)
+    {
+        try {
+            // Create a new journal page with the updated HTML content
+            $journalWithPage = $this->journalRepositoryInterface->createJournalPage($htmlContent, $jouranlId);
+            $journalWithPageArray = json_decode($journalWithPage, true);
+            $pageId = $journalWithPageArray['journal_pages'][0]['id'];
+
+            foreach ($imageUrl as $url) {
+                $this->journalRepositoryInterface->saveJournalImage($url, $pageId);
+            }
+            return $journalWithPage;
+        } catch (Exception $e) {
+            Log::error('JournalService::createPage', [$e->getMessage()]);
         }
     }
 
