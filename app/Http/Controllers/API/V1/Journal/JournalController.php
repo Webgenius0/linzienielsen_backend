@@ -5,12 +5,12 @@ namespace App\Http\Controllers\API\V1\Journal;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\V1\Journal\CreateJournalRequest;
 use App\Http\Requests\API\V1\Journal\JournalArchiveRequest;
-use App\Models\Journal;
 use App\Services\API\V1\Journal\JournalService;
 use App\Traits\V1\ApiResponse;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class JournalController extends Controller
@@ -50,6 +50,21 @@ class JournalController extends Controller
             $validatedData = $journalArchiveRequest->validated();
             $this->journalService->toggleArchive($validatedData);
             return $this->success(200, 'Arcive Status Changed');
+        } catch(ModelNotFoundException $modelNotFoundException) {
+            return $this->error(404, 'Journal Not Found', $modelNotFoundException->getMessage());
+        }catch (Exception $e) {
+            Log::error('JournalController::toggleArchive', [$e->getMessage()]);
+            return $this->error(500, 'Server Error', $e->getMessage());
+        }
+    }
+
+
+    public function search(Request $request): JsonResponse
+    {
+        try {
+            $title = $request->query('title');
+            $response = $this->journalService->searchJournal($title);
+            return $this->success(200, 'Search Result', $response);
         } catch(ModelNotFoundException $modelNotFoundException) {
             return $this->error(404, 'Journal Not Found', $modelNotFoundException->getMessage());
         }catch (Exception $e) {

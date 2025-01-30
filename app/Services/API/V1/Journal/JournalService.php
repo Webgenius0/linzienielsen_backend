@@ -7,16 +7,19 @@ use App\Repositories\API\V1\Journal\JournalRepositoryInterface;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use DOMDocument;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class JournalService
 {
     protected JournalRepositoryInterface $journalRepositoryInterface;
+    protected $user;
 
     public function __construct(JournalRepositoryInterface $journalRepositoryInterface)
     {
         $this->journalRepositoryInterface = $journalRepositoryInterface;
+        $this->user = Auth::user();
     }
 
 
@@ -32,8 +35,8 @@ class JournalService
     {
         try {
             DB::beginTransaction();
-            // Create the journal entry
-            $journal = $this->journalRepositoryInterface->createJournal($credentials['title']);
+            $user =             // Create the journal entry
+            $journal = $this->journalRepositoryInterface->createJournal($credentials['title'], $this->user->id);
             // Create the journal notification
             $this->journalRepositoryInterface->createJournalNotification($credentials, $journal->id);
 
@@ -103,6 +106,19 @@ class JournalService
             $this->journalRepositoryInterface->toggleArchive($credentials['journal_id']);
         } catch (Exception $e) {
             Log::error('JournalService::arciveJournal', [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
+
+
+    public function searchJournal($title)
+    {
+        try {
+            $journals = $this->journalRepositoryInterface->searchJournalByTitle($title, $this->user->id);
+            return $journals;
+        } catch (Exception $e) {
+            Log::error('JournalService::searchJournal', [$e->getMessage()]);
             throw $e;
         }
     }

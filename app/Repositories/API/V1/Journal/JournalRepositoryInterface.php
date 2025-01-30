@@ -16,7 +16,7 @@ interface JournalRepositoryInterface
      *
      * @param array $credentials An array containing the journal's attributes (e.g., 'title').
      */
-    public function createJournal(string $title);
+    public function createJournal(string $title, int $userid);
 
     /**
      * Creates a new journal page for the given journal and content.
@@ -67,5 +67,18 @@ interface JournalRepositoryInterface
      * the exception again.
      * @throws Exception If there is an error during the save operation.
      */
-    public function toggleArchive($id);
+    public function toggleArchive(int $id);
+
+
+
+    /**
+     * Search for journals by title and retrieve the oldest journal page for each.
+     *
+     * This method searches for journals whose titles contain the specified search term.
+     * It returns all journals that match the title search along with the oldest associated
+     * journal page (ordered by ID).
+     *
+     * @throws Exception If there is an error during the database query.
+     */
+    public function searchJournalByTitle(string $title, int $userId);
 }

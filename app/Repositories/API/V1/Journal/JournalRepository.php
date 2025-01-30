@@ -7,7 +7,6 @@ use App\Models\Journal;
 use App\Models\JournalNotification;
 use App\Models\JournalPage;
 use Exception;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class JournalRepository implements JournalRepositoryInterface
@@ -26,12 +25,11 @@ class JournalRepository implements JournalRepositoryInterface
      *
      * @throws \Exception If an error occurs while creating the journal.
      */
-    public function createJournal(string $title)
+    public function createJournal(string $title, int $userId)
     {
         try {
-            $user = Auth::user();
             $journal = Journal::create([
-                'user_id' => $user->id,
+                'user_id' => $userId,
                 'title' => $title,
             ]);
             return $journal;
@@ -148,7 +146,7 @@ class JournalRepository implements JournalRepositoryInterface
      * @param Journal $journal The journal whose archive status is to be toggled.
      * @throws Exception If there is an error during the save operation.
      */
-    public function toggleArchive($id)
+    public function toggleArchive(int $id)
     {
         try {
             $journal = Journal::find($id);
@@ -156,6 +154,32 @@ class JournalRepository implements JournalRepositoryInterface
             $journal->save();
         } catch (Exception $e) {
             Log::error('JournalRepository::toggleArvice', [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
+
+    /**
+     * Search for journals by title and retrieve the oldest journal page for each.
+     *
+     * This method searches for journals whose titles contain the specified search term.
+     * It returns all journals that match the title search along with the oldest associated
+     * journal page (ordered by ID).
+     * @throws Exception If there is an error during the database query.
+     */
+    public function searchJournalByTitle(string $title, int $userId)
+    {
+        try {
+            $journals = Journal::select('id', 'title', 'created_at')->whereUserId($userId)->whereArchive(false)->where('title', 'like', '%' . $title . '%')
+                ->with(['JournalPages' => function ($query) {
+                    $query->orderBy('id', 'asc')->limit(1);
+                }])
+                ->get();
+
+            $journals->makeVisible('created_at');
+            return $journals;
+        } catch (Exception $e) {
+            Log::error('JournalRepository::searchJournalByTitle', [$e->getMessage()]);
             throw $e;
         }
     }
