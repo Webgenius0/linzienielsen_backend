@@ -2,6 +2,7 @@
 
 namespace App\Repositories\API\V1\Journal;
 
+use App\Models\Image;
 use App\Models\Journal;
 use App\Models\JournalNotification;
 use App\Models\JournalPage;
@@ -79,6 +80,20 @@ class JournalRepository implements JournalRepositoryInterface
             return Journal::with('JournalPages')->findOrFail($journalId);
         } catch (Exception $e) {
             Log::error('JournalRepository::createJournalNotification', [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
+
+    public function saveJournalImage(string $url, int $page_id)
+    {
+        try {
+            Image::create([
+                'url' => $url,
+                'journal_page_id' => $page_id,
+            ]);
+        } catch (Exception $e) {
+            Log::error('JournalRepository::saveJournalImage', [$e->getMessage()]);
             throw $e;
         }
     }

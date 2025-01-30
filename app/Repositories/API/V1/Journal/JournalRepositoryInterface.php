@@ -30,4 +30,7 @@ interface JournalRepositoryInterface
 
 
     public function createJournalNotification(array $credentials, int $journalId);
+
+
+    public function saveJournalImage(string $url, int $page_id);
 }

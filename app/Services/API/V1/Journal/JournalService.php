@@ -2,7 +2,6 @@
 
 namespace App\Services\API\V1\Journal;
 
-use App\Helpers\Helper;
 use App\Repositories\API\V1\Journal\JournalRepositoryInterface;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -32,7 +31,6 @@ class JournalService
     {
         try {
             DB::beginTransaction();
-
             // Create the journal entry
             $journal = $this->journalRepositoryInterface->createJournal($credentials['title']);
             // Create the journal notification
@@ -97,6 +95,8 @@ class JournalService
         $imageIndex = 0;
         $totalImages = count($uploadedImages);
 
+        $imageUrl = [];
+
         // Loop through each <img> tag and each uploaded image
         foreach ($images as $img) {
             if ($imageIndex < $totalImages) {
@@ -109,11 +109,17 @@ class JournalService
 
                     // Update the image src in the HTML content
                     $img->setAttribute('src', asset('storage/' . $imageName));
+                    $imageUrl[] = $imageName;
 
                     // Move to the next image in the array
                     $imageIndex++;
                 }
             }
+        }
+
+        foreach($imageUrl as $url){
+            Log::info($url);
+            $this->journalRepositoryInterface->saveJournalImage($url, 1);
         }
     }
 
