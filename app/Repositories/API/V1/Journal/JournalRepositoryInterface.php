@@ -33,4 +33,7 @@ interface JournalRepositoryInterface
 
 
     public function saveJournalImage(string $url, int $page_id);
+
+
+    public function nextPageOfJournal(int $journalId);
 }

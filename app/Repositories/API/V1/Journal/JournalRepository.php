@@ -97,4 +97,22 @@ class JournalRepository implements JournalRepositoryInterface
             throw $e;
         }
     }
+
+
+    public function nextPageOfJournal(int $journalId)
+    {
+        try {
+            $lastJournalPage = Journal::find($journalId)
+                ->JournalPages()
+                ->latest('id')
+                ->first();
+
+            $newPageNumber = JournalPage::latest('id')
+            ->first();
+            return $lastJournalPage ? $lastJournalPage->id + 1 : $newPageNumber +1;
+        } catch (Exception $e) {
+            Log::error('JournalRepository::lastPageOfJournal', [$e->getMessage()]);
+            throw $e;
+        }
+    }
 }

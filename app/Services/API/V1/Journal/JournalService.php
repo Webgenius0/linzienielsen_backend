@@ -36,12 +36,20 @@ class JournalService
             // Create the journal notification
             $this->journalRepositoryInterface->createJournalNotification($credentials, $journal->id);
 
+            $response = $this->processHtmlContent($credentials['content'], $credentials['images'], $journal->id);
+
             // Get and process the HTML content
-            $htmlContent = $this->processHtmlContent($credentials['content'], $credentials['images'], $journal->id);
+            $htmlContent = $response[0];
+            $imageUrl = $response[1];
 
             // Create a new journal page with the updated HTML content
             $journalWithPage = $this->journalRepositoryInterface->createJournalPage($htmlContent, $journal->id);
+            $journalWithPageArray = json_decode($journalWithPage, true);
+            $pageId = $journalWithPageArray['journal_pages'][0]['id'];
 
+            foreach($imageUrl as $url){
+                $this->journalRepositoryInterface->saveJournalImage($url, $pageId);
+            }
             // Commit the transaction
             DB::commit();
 
@@ -61,9 +69,8 @@ class JournalService
      * @param array $uploadedImages The array of uploaded images.
      * @param int $journalId The ID of the journal.
      *
-     * @return string The updated HTML content with processed images and replaced attributes.
      */
-    private function processHtmlContent(string $htmlContent, array $uploadedImages, int $journalId): string
+    private function processHtmlContent(string $htmlContent, array $uploadedImages, int $journalId)
     {
         // Create a new DOMDocument instance to parse the HTML
         $dom = new DOMDocument();
@@ -72,13 +79,13 @@ class JournalService
         libxml_clear_errors(); // Clear any libxml errors
 
         // Replace image sources with uploaded images
-        $this->processImagesInHtml($dom, $uploadedImages, $journalId);
+        $imageurl = $this->processImagesInHtml($dom, $uploadedImages, $journalId);
 
         // After processing all images, get the content inside the <body> tag directly
         $updatedHtmlContent = $this->extractBodyContent($dom);
 
         // Replace escaped double quotes with single quotes in the `src` attributes
-        return $this->replaceDoubleQuotesWithSingle($updatedHtmlContent);
+        return [$this->replaceDoubleQuotesWithSingle($updatedHtmlContent), $imageurl];
     }
 
 
@@ -89,7 +96,7 @@ class JournalService
      * @param array $uploadedImages The array of uploaded images.
      * @param int $journalId The ID of the journal.
      */
-    private function processImagesInHtml(DOMDocument $dom, array $uploadedImages, int $journalId): void
+    private function processImagesInHtml(DOMDocument $dom, array $uploadedImages, int $journalId)
     {
         $images = $dom->getElementsByTagName('img');
         $imageIndex = 0;
@@ -116,11 +123,7 @@ class JournalService
                 }
             }
         }
-
-        foreach($imageUrl as $url){
-            Log::info($url);
-            $this->journalRepositoryInterface->saveJournalImage($url, 1);
-        }
+        return $imageUrl;
     }
 
 
