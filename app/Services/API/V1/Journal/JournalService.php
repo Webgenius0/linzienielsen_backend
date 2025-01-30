@@ -56,6 +56,12 @@ class JournalService
     }
 
 
+    /**
+     * Create a new journal page by processing HTML content and images.
+     *
+     * @param array $credentials The credentials containing content, images, and journal ID.
+     * @throws Exception If an error occurs during the journal page creation process.
+     */
     public function createJournalPage(array $credentials)
     {
         try {
@@ -80,6 +86,14 @@ class JournalService
     }
 
 
+    /**
+     * Create a journal page and associate images with it.
+     *
+     * @param string $htmlContent The HTML content to be added to the journal page.
+     * @param array $imageUrl An array of image URLs to be associated with the page.
+     * @param int $jouranlId The ID of the journal where the page is created.
+     * @throws Exception If an error occurs during page creation or image saving.
+     */
     public function createPage(string $htmlContent, array $imageUrl, int $jouranlId)
     {
         try {
