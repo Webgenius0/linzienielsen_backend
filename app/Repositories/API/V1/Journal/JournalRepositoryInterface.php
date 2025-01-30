@@ -2,6 +2,9 @@
 
 namespace App\Repositories\API\V1\Journal;
 
+use App\Models\Journal;
+use Exception;
+
 interface JournalRepositoryInterface
 {
     /**
@@ -24,7 +27,7 @@ interface JournalRepositoryInterface
      *
      * @param string $content The content of the journal page.
      * @param int $journalId The ID of the journal to which the page belongs.
-     * @throws \Exception If there is an error during the creation process.
+     * @throws Exception If there is an error during the creation process.
      */
     public function createJournalPage(string $content, int $journalId);
 
@@ -33,7 +36,7 @@ interface JournalRepositoryInterface
      *
      * @param array $credentials The reminder credentials (type and time).
      * @param int $journalId The ID of the journal for which the notification is created.
-     * @throws \Exception If an error occurs during the creation of the notification.
+     * @throws Exception If an error occurs during the creation of the notification.
      */
     public function createJournalNotification(array $credentials, int $journalId);
 
@@ -42,7 +45,7 @@ interface JournalRepositoryInterface
      *
      * @param string $url The URL of the image.
      * @param int $page_id The ID of the journal page where the image will be saved.
-     * @throws \Exception If an error occurs during the saving of the image.
+     * @throws Exception If an error occurs during the saving of the image.
      */
     public function saveJournalImage(string $url, int $page_id);
 
@@ -50,7 +53,19 @@ interface JournalRepositoryInterface
      * Get the next page number for a journal.
      *
      * @param int $journalId The ID of the journal.
-     * @throws \Exception If an error occurs during the retrieval of the next page.
+     * @throws Exception If an error occurs during the retrieval of the next page.
      */
     public function nextPageOfJournal(int $journalId);
+
+
+    /**
+     * Toggle the archive status of a given journal.
+     *
+     * This method inverts the current 'archive' status of the provided
+     * Journal model and saves the updated state to the database. If an error
+     * occurs during the save operation, it logs the error message and throws
+     * the exception again.
+     * @throws Exception If there is an error during the save operation.
+     */
+    public function toggleArchive($id);
 }

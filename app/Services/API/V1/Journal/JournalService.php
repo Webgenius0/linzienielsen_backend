@@ -2,6 +2,7 @@
 
 namespace App\Services\API\V1\Journal;
 
+use App\Models\Journal;
 use App\Repositories\API\V1\Journal\JournalRepositoryInterface;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -84,6 +85,32 @@ class JournalService
             throw $e;
         }
     }
+
+
+    /**
+     * Toggle the archive status of the given journal.
+     *
+     * This method calls the repository method to toggle the archive status
+     * of the provided journal. If an error occurs, it logs the error and
+     * throws the exception.
+     *
+     * @param Journal $journal The journal whose archive status is to be toggled.
+     * @throws Exception If an error occurs during the repository operation.
+     */
+    public function toggleArchive($credentials)
+    {
+        try {
+            $this->journalRepositoryInterface->toggleArchive($credentials['journal_id']);
+        } catch (Exception $e) {
+            Log::error('JournalService::arciveJournal', [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
+
+    // -------------------------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------------------
 
 
     /**

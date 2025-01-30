@@ -136,4 +136,27 @@ class JournalRepository implements JournalRepositoryInterface
             throw $e;
         }
     }
+
+    /**
+     * Toggle the archive status of a given journal.
+     *
+     * This method inverts the current 'archive' status of the provided
+     * Journal model and saves the updated state to the database. If an error
+     * occurs during the save operation, it logs the error message and throws
+     * the exception again.
+     *
+     * @param Journal $journal The journal whose archive status is to be toggled.
+     * @throws Exception If there is an error during the save operation.
+     */
+    public function toggleArchive($id)
+    {
+        try {
+            $journal = Journal::find($id);
+            $journal->archive = !$journal->archive;
+            $journal->save();
+        } catch (Exception $e) {
+            Log::error('JournalRepository::toggleArvice', [$e->getMessage()]);
+            throw $e;
+        }
+    }
 }
