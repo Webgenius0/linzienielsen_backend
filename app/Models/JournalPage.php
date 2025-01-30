@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,7 +24,6 @@ class JournalPage extends Model
     protected $hidden = [
         'password',
         'remember_token',
-        'created_at',
         'updated_at',
         'deleted_at',
     ];
@@ -37,6 +37,14 @@ class JournalPage extends Model
     public function journalPage(): BelongsTo
     {
         return $this->belongsTo(Journal::class);
+    }
+
+    /**
+     * accessor for created_at attribute
+     */
+    public function getCreatedAtAttribute($value)
+    {
+        return Carbon::parse($value)->format('d F Y');
     }
 
     /**

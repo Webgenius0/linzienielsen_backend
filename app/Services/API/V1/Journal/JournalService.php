@@ -7,6 +7,7 @@ use App\Repositories\API\V1\Journal\JournalRepositoryInterface;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use DOMDocument;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -16,10 +17,90 @@ class JournalService
     protected JournalRepositoryInterface $journalRepositoryInterface;
     protected $user;
 
+    /**
+     * JournalService constructor.
+     *
+     * @param JournalRepositoryInterface $journalRepositoryInterface The repository interface for journal operations.
+     */
     public function __construct(JournalRepositoryInterface $journalRepositoryInterface)
     {
         $this->journalRepositoryInterface = $journalRepositoryInterface;
         $this->user = Auth::user();
+    }
+
+
+    /**
+     * Retrieve a list of public journals for the authenticated user.
+     *
+     * @return mixed A list of public journals.
+     * @throws Exception If an error occurs while retrieving journals.
+     */
+    public function getJournals()
+    {
+        try {
+            return $this->journalRepositoryInterface->listUserPublicJournals($this->user->id);
+        } catch (Exception $e) {
+            Log::error('JournalService::getJournals', [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
+
+    /**
+     * Retrieve a list of archived journals for the authenticated user.
+     *
+     * @return mixed A list of archived journals.
+     * @throws Exception If an error occurs while retrieving archived journals.
+     */
+    public function getArchiveJournals()
+    {
+        try {
+            return $this->journalRepositoryInterface->listUserArchivedJournals($this->user->id);
+        } catch (Exception $e) {
+            Log::error('JournalService::getArchiveJournals', [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
+
+    /**
+     * Retrieve a list of pages for a specific journal.
+     *
+     * @param int $journalId The ID of the journal.
+     * @return mixed A list of journal pages.
+     * @throws Exception If an error occurs while retrieving journal pages.
+     */
+    public function getJournalPages($journalId)
+    {
+        try {
+            return $this->journalRepositoryInterface->listJournalPages($journalId);
+        } catch (ModelNotFoundException $modelNotFoundException) {
+            throw $modelNotFoundException;
+        } catch (Exception $e) {
+            Log::error('JournalService::getJournalPages', [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
+
+
+    /**
+     * Retrieve details of a specific journal page.
+     *
+     * @param int $pageId The ID of the journal page.
+     * @return mixed The details of the journal page.
+     * @throws Exception If an error occurs while retrieving the journal page.
+     */
+    public function showJournalPage($pageId)
+    {
+        try {
+            return $this->journalRepositoryInterface->showJournalPage($pageId);
+        } catch (ModelNotFoundException $modelNotFoundException) {
+            throw $modelNotFoundException;
+        } catch (Exception $e) {
+            Log::error('JournalService::showJournalPage', [$e->getMessage()]);
+            throw $e;
+        }
     }
 
 
@@ -36,7 +117,7 @@ class JournalService
         try {
             DB::beginTransaction();
             $user =             // Create the journal entry
-            $journal = $this->journalRepositoryInterface->createJournal($credentials['title'], $this->user->id);
+                $journal = $this->journalRepositoryInterface->createJournal($credentials['title'], $this->user->id);
             // Create the journal notification
             $this->journalRepositoryInterface->createJournalNotification($credentials, $journal->id);
 

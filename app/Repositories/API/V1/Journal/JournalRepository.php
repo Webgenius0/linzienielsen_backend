@@ -7,10 +7,123 @@ use App\Models\Journal;
 use App\Models\JournalNotification;
 use App\Models\JournalPage;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
 
 class JournalRepository implements JournalRepositoryInterface
 {
+    /**
+     * List public journals for a specific user.
+     *
+     * This method retrieves a list of journals that are not archived for a given user,
+     * including the first page of each journal ordered by ID.
+     *
+     * @param int $userId The ID of the user whose public journals are to be retrieved.
+     * @throws Exception If an error occurs during the retrieval process.
+     */
+    public function listUserPublicJournals($userId)
+    {
+        try {
+            $journals = Journal::select('id', 'title', 'created_at')
+                ->whereUserId($userId)
+                ->whereArchive(false)
+                ->with(['JournalPages' => function ($query) {
+                    $query->orderBy('id', 'asc')->limit(1);
+                }])
+                ->orderBy('id', 'desc')
+                ->get();
+
+            $journals->makeVisible('created_at');
+
+            return $journals;
+        } catch (Exception $e) {
+            Log::error('JournalRepository::listpublicUserJournals', [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
+    /**
+     * List archived journals for a specific user.
+     *
+     * This method retrieves a list of archived journals for a given user,
+     * including the first page of each journal ordered by ID.
+     *
+     * @param int $userId The ID of the user whose archived journals are to be retrieved.
+     * @throws Exception If an error occurs during the retrieval process.
+     */
+    public function listUserArchivedJournals($userId)
+    {
+        try {
+            $journals = Journal::select('id', 'title', 'created_at')
+                ->whereUserId($userId)
+                ->whereArchive(true)
+                ->with(['JournalPages' => function ($query) {
+                    $query->orderBy('id', 'asc')->limit(1);
+                }])
+                ->orderBy('id', 'desc')
+                ->get();
+
+            $journals->makeVisible('created_at');
+            return $journals;
+        } catch (Exception $e) {
+            Log::error('JournalRepository::listpublicUserJournals', [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
+
+    /**
+     * List pages of a specific journal.
+     *
+     * This method retrieves the journal along with its pages, ordered by ID in descending order.
+     *
+     * @param int $journalId The ID of the journal whose pages are to be retrieved.
+     * @throws Exception If an error occurs during the retrieval process.
+     */
+    public function listJournalPages($journalId)
+    {
+        try {
+            $journals = Journal::select('id', 'title', 'created_at')
+                ->whereId($journalId)
+                ->with(['JournalPages' => function ($query) {
+                    $query->orderBy('id', 'desc');
+                }])
+                ->get();
+
+            $journals->makeVisible('created_at');
+
+            return $journals;
+        } catch (ModelNotFoundException $modelNotFoundException) {
+            throw $modelNotFoundException;
+        } catch (Exception $e) {
+            Log::error('JournalRepository::listJournalPage', [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
+
+    /**
+     * Show a specific journal page.
+     *
+     * This method retrieves a single journal page by its ID.
+     *
+     * @param int $journalPageId The ID of the journal page to be retrieved.
+     * @throws Exception If an error occurs during the retrieval process.
+     */
+    public function showJournalPage($journalPageId)
+    {
+        try {
+            $page =  JournalPage::findOrFail($journalPageId);
+            $page->makeVisible('created_at');
+
+            return $page;
+        } catch (ModelNotFoundException $modelNotFoundException) {
+            throw $modelNotFoundException;
+        } catch (Exception $e) {
+            Log::error('JournalRepository::showJournalPage', [$e->getMessage()]);
+            throw $e;
+        }
+    }
 
     /**
      * Create a new journal entry for the authenticated user.

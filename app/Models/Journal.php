@@ -29,9 +29,12 @@ class Journal extends Model
     ];
 
 
+    /**
+     * accessor for created_at attribute
+     */
     public function getCreatedAtAttribute($value)
     {
-        return Carbon::parse($value)->format('d F Y'); // Format as '25 January 2025'
+        return Carbon::parse($value)->format('d F Y');
     }
 
 
@@ -50,7 +53,7 @@ class Journal extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function JournalPages():HasMany
+    public function JournalPages(): HasMany
     {
         return $this->hasMany(JournalPage::class);
     }
@@ -60,7 +63,7 @@ class Journal extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function journalNotification():HasOne
+    public function journalNotification(): HasOne
     {
         return $this->hasOne(JournalNotification::class);
     }

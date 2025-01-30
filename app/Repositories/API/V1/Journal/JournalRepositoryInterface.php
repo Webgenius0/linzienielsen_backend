@@ -7,6 +7,49 @@ use Exception;
 
 interface JournalRepositoryInterface
 {
+
+    /**
+     * List public journals for a specific user.
+     *
+     * This method retrieves a list of journals that are not archived for a given user,
+     * including the first page of each journal ordered by ID.
+     *
+     * @param int $userId The ID of the user whose public journals are to be retrieved.
+     * @throws Exception If an error occurs during the retrieval process.
+     */
+    public function listUserPublicJournals($userId);
+
+    /**
+     * List archived journals for a specific user.
+     *
+     * This method retrieves a list of archived journals for a given user,
+     * including the first page of each journal ordered by ID.
+     *
+     * @param int $userId The ID of the user whose archived journals are to be retrieved.
+     * @throws Exception If an error occurs during the retrieval process.
+     */
+    public function listUserArchivedJournals($userId);
+
+    /**
+     * List pages of a specific journal.
+     *
+     * This method retrieves the journal along with its pages, ordered by ID in descending order.
+     *
+     * @param int $journalId The ID of the journal whose pages are to be retrieved.
+     * @throws Exception If an error occurs during the retrieval process.
+     */
+    public function listJournalPages($journalId);
+
+    /**
+     * Show a specific journal page.
+     *
+     * This method retrieves a single journal page by its ID.
+     *
+     * @param int $journalPageId The ID of the journal page to be retrieved.
+     * @throws Exception If an error occurs during the retrieval process.
+     */
+    public function showJournalPage($journalPageId);
+
     /**
      * Create a new journal entry for the authenticated user.
      *
