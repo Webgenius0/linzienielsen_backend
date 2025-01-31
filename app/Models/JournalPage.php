@@ -34,7 +34,7 @@ class JournalPage extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function journalPage(): BelongsTo
+    public function journal(): BelongsTo
     {
         return $this->belongsTo(Journal::class);
     }

@@ -66,6 +66,12 @@ class JournalPageController extends Controller
     }
 
 
+    /**
+     * Display a paginated list of journal pages.
+     *
+     * @param Request $request The HTTP request object containing query parameters.
+     * @return JsonResponse A JSON response with the journal page list or an error message.
+     */
     public function show(Request $request): JsonResponse
     {
         try {
@@ -81,11 +87,17 @@ class JournalPageController extends Controller
     }
 
 
+    /**
+     * Delete a specific journal page by ID.
+     *
+     * @param Request $request The HTTP request object containing query parameters.
+     * @return JsonResponse A JSON response indicating success or an error message.
+     */
     public function destroy(Request $request): JsonResponse
     {
         try {
             $journalId = $request->query('journal_page_id');
-            $this->journalService->deleteJournal($journalId);
+            $this->journalService->deleteJournalPage($journalId);
             return $this->success(200, 'Deleted Successfully');
         } catch (ModelNotFoundException $modelNotFoundException) {
             return $this->error(404, 'page Not Found', $modelNotFoundException->getMessage());

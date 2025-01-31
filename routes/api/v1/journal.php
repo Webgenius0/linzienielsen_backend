@@ -20,4 +20,5 @@ Route::prefix('/page')->name('page.')->controller(JournalPageController::class)-
     Route::get('/', 'index')->name('page');
     Route::post('/store', 'store')->name('store');
     Route::get('/show', 'show')->name('show');
+    Route::delete('/destroy', 'destroy')->name('destroy');
 });

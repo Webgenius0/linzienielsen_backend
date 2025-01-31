@@ -3,6 +3,7 @@
 namespace App\Services\API\V1\Journal;
 
 use App\Models\Journal;
+use App\Models\JournalPage;
 use App\Repositories\API\V1\Journal\JournalRepositoryInterface;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -232,7 +233,46 @@ class JournalService
         } catch (AccessDeniedHttpException $accessDeniedHttpException) {
             throw $accessDeniedHttpException;
         } catch (Exception $e) {
-            Log::error('JournalService::searchJournal', [$e->getMessage()]);
+            Log::error('JournalService::deleteJournal', [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
+
+
+    /**
+     * Delete a journal page.
+     *
+     * This method retrieves a journal page by its ID, checks if the authenticated
+     * user owns the associated journal, and deletes the journal page if authorized.
+     *
+     * It handles the following exceptions:
+     * - ModelNotFoundException: If the journal page does not exist.
+     * - AccessDeniedHttpException: If the user is not authorized to delete the journal page.
+     * - General Exception: Logs any unexpected errors and rethrows them.
+     *
+     * @param  int  $journalPageId  The ID of the journal page to delete.
+     * @return void
+     *
+     * @throws ModelNotFoundException If the journal page is not found.
+     * @throws AccessDeniedHttpException If the user does not have permission to delete the journal page.
+     * @throws Exception If any other error occurs.
+     */
+    public function deleteJournalPage($journalPageId)
+    {
+        try {
+            $journalPage = JournalPage::with(['journal'])->findOrFail($journalPageId);
+            Log::info($journalPage);
+            if ($journalPage->journal->user_id != $this->user->id) {
+                throw new AccessDeniedHttpException();
+            }
+            $journalPage->delete();
+        } catch (ModelNotFoundException $e) {
+            throw $e;
+        } catch (AccessDeniedHttpException $accessDeniedHttpException) {
+            throw $accessDeniedHttpException;
+        } catch (Exception $e) {
+            Log::error('JournalService::deleteJournalPage', [$e->getMessage()]);
             throw $e;
         }
     }
