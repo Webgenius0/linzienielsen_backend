@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class JournalPageController extends Controller
 {
@@ -75,6 +76,23 @@ class JournalPageController extends Controller
             return $this->error(404, 'Journal Page Not Found', $modelNotFoundException->getMessage());
         } catch (Exception $e) {
             Log::error('JournalController::index', [$e->getMessage()]);
+            return $this->error(500, 'Server Error', $e->getMessage());
+        }
+    }
+
+
+    public function destroy(Request $request): JsonResponse
+    {
+        try {
+            $journalId = $request->query('journal_page_id');
+            $this->journalService->deleteJournal($journalId);
+            return $this->success(200, 'Deleted Successfully');
+        } catch (ModelNotFoundException $modelNotFoundException) {
+            return $this->error(404, 'page Not Found', $modelNotFoundException->getMessage());
+        } catch (AccessDeniedHttpException $accessDeniedHttpException) {
+            return $this->error(404, 'Access Denied', $accessDeniedHttpException->getMessage());
+        } catch (Exception $e) {
+            Log::error('JournalController::toggleArchive', [$e->getMessage()]);
             return $this->error(500, 'Server Error', $e->getMessage());
         }
     }

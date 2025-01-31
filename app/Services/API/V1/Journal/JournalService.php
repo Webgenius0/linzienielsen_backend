@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class JournalService
 {
@@ -198,6 +199,38 @@ class JournalService
         try {
             $journals = $this->journalRepositoryInterface->searchJournalByTitle($title, $this->user->id);
             return $journals;
+        } catch (Exception $e) {
+            Log::error('JournalService::searchJournal', [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
+
+
+    /**
+     * Delete a journal entry by ID.
+     *
+     * This method attempts to find and delete a journal entry. It ensures that
+     * the authenticated user owns the journal before deleting it. If the journal
+     * is not found, or if the user lacks permission, appropriate exceptions are thrown.
+     *
+     * @param  int  $journalId  The ID of the journal to be deleted.
+     * @throws ModelNotFoundException If the journal does not exist.
+     * @throws AccessDeniedHttpException If the user is not authorized to delete the journal.
+     * @throws Exception If any other error occurs during deletion.
+     */
+    public function deleteJournal($journalId)
+    {
+        try {
+            $journal = Journal::findOrFail($journalId);
+            if ($journal->user_id != $this->user->id) {
+                throw new AccessDeniedHttpException();
+            }
+            $journal->delete();
+        } catch (ModelNotFoundException $e) {
+            throw $e;
+        } catch (AccessDeniedHttpException $accessDeniedHttpException) {
+            throw $accessDeniedHttpException;
         } catch (Exception $e) {
             Log::error('JournalService::searchJournal', [$e->getMessage()]);
             throw $e;

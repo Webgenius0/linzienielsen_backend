@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class JournalController extends Controller
 {
@@ -113,6 +114,41 @@ class JournalController extends Controller
             return $this->success(200, 'Search Result', $response);
         } catch (ModelNotFoundException $modelNotFoundException) {
             return $this->error(404, 'Journal Not Found', $modelNotFoundException->getMessage());
+        } catch (Exception $e) {
+            Log::error('JournalController::toggleArchive', [$e->getMessage()]);
+            return $this->error(500, 'Server Error', $e->getMessage());
+        }
+    }
+
+
+
+    /**
+     * Delete a journal entry.
+     *
+     * This method retrieves the journal ID from the query parameters, attempts
+     * to delete the corresponding journal entry, and returns a success response.
+     * It handles various exceptions, including:
+     * - ModelNotFoundException: If the journal does not exist.
+     * - AccessDeniedHttpException: If the user is not authorized to delete the journal.
+     * - General Exception: Logs any unexpected errors and returns a server error response.
+     *
+     * @param  Request  $request  The HTTP request containing the journal ID as a query parameter.
+     * @return JsonResponse  A JSON response indicating success or failure.
+     *
+     * @throws ModelNotFoundException If the journal is not found.
+     * @throws AccessDeniedHttpException If the user does not have permission to delete the journal.
+     * @throws Exception If any other error occurs.
+     */
+    public function destroy(Request $request): JsonResponse
+    {
+        try {
+            $journalId = $request->query('journal_id');
+            $this->journalService->deleteJournal($journalId);
+            return $this->success(200, 'Deleted Successfully');
+        } catch (ModelNotFoundException $modelNotFoundException) {
+            return $this->error(404, 'Journal Not Found', $modelNotFoundException->getMessage());
+        } catch (AccessDeniedHttpException $accessDeniedHttpException) {
+            return $this->error(404, 'Access Denied', $accessDeniedHttpException->getMessage());
         } catch (Exception $e) {
             Log::error('JournalController::toggleArchive', [$e->getMessage()]);
             return $this->error(500, 'Server Error', $e->getMessage());
