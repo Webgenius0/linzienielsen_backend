@@ -16,10 +16,11 @@ class ProfileResource extends JsonResource
     {
         return [
             'name' => $this->resource['name'] ?? null,
+            'email' =>  $this->resource['email'] ?? null,
             'avatar' => $this->resource['avatar'] ?? null,
-            'gender' => $this->resource['profile']['gender'] ?? null, // Fixed the error here
+            'gender' => $this->resource['profile']['gender'] ?? null,
             'country' => $this->resource['profile']['country'] ?? null,
-            'date_of_birth' => $this->resource['profile']['date_of_birth'] ?? null, // Corrected this too
+            'date_of_birth' => $this->resource['profile']['date_of_birth'] ?? null,
         ];
     }
 }

@@ -28,7 +28,7 @@ class UserRepository implements UserRepositoryInterface
     public function getAuthUser()
     {
         try {
-            $user = User::select('id', 'name', 'avatar')->with([
+            $user = User::select('id', 'name', 'email', 'avatar')->with([
                 'profile' => function ($query) {
                     $query->select('id', 'user_id', 'gender', 'date_of_birth', 'country', 'user_id');  // Select specific columns from Profile
                 }
