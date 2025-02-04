@@ -13,6 +13,8 @@ Route::controller(JournalController::class)->group(function () {
     Route::post('/archive', 'toggleArchive')->name('archive');
     Route::get('/search', 'search')->name('search');
     Route::delete('/destroy', 'destroy')->name('destroy');
+
+    Route::post('/store2', 'store2')->name('store2');
 });
 
 

@@ -432,17 +432,23 @@ class JournalService
 
     public function store($content)
     {
+        if (!is_array($content)) {
+            Log::error('JournalService::store - Invalid content received', ['content' => $content]);
+            return [
+                'status' => 'error',
+                'message' => 'Invalid content format'
+            ];
+        }
+
         $htmlOutput = '';
         $imagePaths = [];
 
         foreach ($content as $item) {
             if (isset($item['insert']['_type']) && $item['insert']['_type'] === 'image') {
-                // Handle image upload
                 $imagePath = $this->saveImage($item['insert']['source']);
-                $htmlOutput .= '<img src="' . asset('storage/' . $imagePath) . '" alt="uploaded image">';
+                $htmlOutput .= "<img src='" . asset('storage/' . $imagePath) . "'>";
                 $imagePaths[] = $imagePath;
             } elseif (isset($item['insert']) && is_string($item['insert'])) {
-                // Handle formatted text
                 $htmlOutput .= $this->formatText($item['insert'], $item['attributes'] ?? []);
             }
         }
@@ -453,6 +459,7 @@ class JournalService
             'image_paths' => $imagePaths
         ];
     }
+
 
     private function saveImage($filePath)
     {
@@ -471,7 +478,8 @@ class JournalService
         $html = htmlentities($text);
 
         // Handle heading levels (h1 - h6)
-        if (isset($attributes['h']) && in_array($attributes['h'], [1, 2, 3, 4, 5, 6])) {
+        if (isset($attributes['h']) && in_array($attributes['h'], [1, 2, 3, 4, 5, 6]))
+        {
             $html = "<h{$attributes['h']}>$html</h{$attributes['h']}>";
         } else {
             // Default to paragraph if no heading is specified
