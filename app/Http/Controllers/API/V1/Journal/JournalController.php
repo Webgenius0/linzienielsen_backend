@@ -155,19 +155,4 @@ class JournalController extends Controller
         }
     }
 
-
-    // public function store2(Request $request)
-    // {
-    //     Log::info('Received Request:', ['request' => $request->all()]);
-
-    //     try {
-    //         $content = $request->content ?? $request->all(); // Use request body if no 'content' key
-    //         return $this->journalService->store($content);
-    //     } catch(Exception $e) {
-    //         Log::error('JournalController::store2', [$e->getMessage()]);
-    //         return $this->error(500, 'Server Error', $e->getMessage());
-    //     }
-    // }
-
-
 }
