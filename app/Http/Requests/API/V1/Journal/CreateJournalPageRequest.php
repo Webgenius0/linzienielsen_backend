@@ -27,7 +27,7 @@ class CreateJournalPageRequest extends FormRequest
     {
         return [
             'journal_id' => 'required|exists:journals,id',
-            'content' => 'required|string',
+            'content' => 'required|array',
         ];
     }
 
@@ -43,7 +43,7 @@ class CreateJournalPageRequest extends FormRequest
             'journal_id.required' => 'The journal ID field is required.',
             'journal_id.exists' => 'The selected journal ID does not exist in our records.',
             'content.required' => 'Please provide content for the journal entry.',
-            'content.string' => 'The content must be a valid string.',
+            'content.array' => 'The content must be a valid array.',
         ];
     }
 

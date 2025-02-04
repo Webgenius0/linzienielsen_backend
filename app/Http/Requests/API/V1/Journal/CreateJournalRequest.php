@@ -27,7 +27,7 @@ class CreateJournalRequest extends FormRequest
     {
         return [
             'title' => 'required|string',
-            'content' => 'required|string',
+            'content' => 'required|array',
             'reminder_type' => 'required|in:daily,weekly,monthly',
             'reminder_time' => 'required|date_format:H:i',
         ];
@@ -45,7 +45,7 @@ class CreateJournalRequest extends FormRequest
             'title.required' => 'The note title is required.',
             'title.string' => 'The title must be a valid string.',
             'content.required' => 'The content field cannot be empty.',
-            'content.string' => 'The content must be a valid string.',
+            'content.array' => 'The content must be a valid array.',
             'reminder_type.required' => 'Please select a reminder type (daily, weekly, or monthly).',
             'reminder_type.in' => 'Invalid reminder type. Choose from daily, weekly, or monthly.',
             'reminder_time.required' => 'Please specify a reminder time.',

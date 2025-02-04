@@ -57,8 +57,8 @@ class JournalPageController extends Controller
     {
         try {
             $validatedData = $createJournalPageRequest->validated();
-            $response = $this->journalService->createJournalPage($validatedData);
-            return $this->success(200, 'Journal Page Created Successfully', $response);
+            // $response = $this->journalService->createJournalPage($validatedData);
+            return $this->success(200, 'Journal Page Created Successfully');
         } catch (Exception $e) {
             Log::error('JournalService::processImagesInHtml', [$e->getMessage()]);
             return $this->error(500, 'Server Error', $e->getMessage());

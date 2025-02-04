@@ -2,6 +2,7 @@
 
 namespace App\Services\API\V1\Journal;
 
+use App\Models\Image;
 use App\Models\Journal;
 use App\Models\JournalPage;
 use App\Repositories\API\V1\Journal\JournalRepositoryInterface;
@@ -107,28 +108,21 @@ class JournalService
     }
 
 
-    /**
-     * Creates a journal and processes its content, including uploading images.
-     *
-     * @param array $credentials The data to create the journal, including title, content, and images.
-     *
-     * @return mixed The created journal page with updated content.
-     * @throws Exception If an error occurs during journal creation.
-     */
     public function createJournal(array $credentials)
     {
         try {
             DB::beginTransaction();
-            $user =             // Create the journal entry
-                $journal = $this->journalRepositoryInterface->createJournal($credentials['title'], $this->user->id);
+            $journal = $this->journalRepositoryInterface->createJournal($credentials['title'], $this->user->id);
             // Create the journal notification
             $this->journalRepositoryInterface->createJournalNotification($credentials, $journal->id);
 
-            $response = $this->processHtmlContent($credentials['content'], $credentials['images'], $journal->id);
+            $response = $this->htmlFormat($credentials['content'], $journal->id);
 
             // Get and process the HTML content
             $htmlContent = $response[0];
+            Log::info($htmlContent);
             $imageUrl = $response[1];
+            Log::info($imageUrl);
 
             // Create a new journal page with the updated HTML content
             $journalWithPage = $this->createPage($htmlContent, $imageUrl, $journal->id);
@@ -145,33 +139,69 @@ class JournalService
 
 
     /**
+     * Creates a journal and processes its content, including uploading images.
+     *
+     * @param array $credentials The data to create the journal, including title, content, and images.
+     *
+     * @return mixed The created journal page with updated content.
+     * @throws Exception If an error occurs during journal creation.
+     */
+    // public function createJournal(array $credentials)
+    // {
+    //     try {
+    //         DB::beginTransaction();
+    //         $journal = $this->journalRepositoryInterface->createJournal($credentials['title'], $this->user->id);
+    //         // Create the journal notification
+    //         $this->journalRepositoryInterface->createJournalNotification($credentials, $journal->id);
+
+    //         $response = $this->processHtmlContent($credentials['content'], $credentials['images'], $journal->id);
+
+    //         // Get and process the HTML content
+    //         $htmlContent = $response[0];
+    //         $imageUrl = $response[1];
+
+    //         // Create a new journal page with the updated HTML content
+    //         $journalWithPage = $this->createPage($htmlContent, $imageUrl, $journal->id);
+    //         // Commit the transaction
+    //         DB::commit();
+
+    //         return $journalWithPage;
+    //     } catch (Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('JournalService::createJournal', [$e->getMessage()]);
+    //         throw $e;
+    //     }
+    // }
+
+
+    /**
      * Create a new journal page by processing HTML content and images.
      *
      * @param array $credentials The credentials containing content, images, and journal ID.
      * @throws Exception If an error occurs during the journal page creation process.
      */
-    public function createJournalPage(array $credentials)
-    {
-        try {
-            DB::beginTransaction();
+    // public function createJournalPage(array $credentials)
+    // {
+    //     try {
+    //         DB::beginTransaction();
 
-            $response = $this->processHtmlContent($credentials['content'], $credentials['images'], $credentials['journal_id']);
+    //         $response = $this->processHtmlContent($credentials['content'], $credentials['images'], $credentials['journal_id']);
 
-            // Get and process the HTML content
-            $htmlContent = $response[0];
-            $imageUrl = $response[1];
+    //         // Get and process the HTML content
+    //         $htmlContent = $response[0];
+    //         $imageUrl = $response[1];
 
-            // Create a new journal page with the updated HTML content
-            $journalWithPage = $this->createPage($htmlContent, $imageUrl, $credentials['journal_id']);
-            DB::commit();
+    //         // Create a new journal page with the updated HTML content
+    //         $journalWithPage = $this->createPage($htmlContent, $imageUrl, $credentials['journal_id']);
+    //         DB::commit();
 
-            return $journalWithPage;
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::error('JournalService::createJournalPage', [$e->getMessage()]);
-            throw $e;
-        }
-    }
+    //         return $journalWithPage;
+    //     } catch (Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('JournalService::createJournalPage', [$e->getMessage()]);
+    //         throw $e;
+    //     }
+    // }
 
 
     /**
@@ -301,7 +331,9 @@ class JournalService
             $pageId = $journalWithPageArray['journal_pages'][0]['id'];
 
             foreach ($imageUrl as $url) {
-                $this->journalRepositoryInterface->saveJournalImage($url, $pageId);
+                if ($url != null) {
+                    $this->journalRepositoryInterface->saveJournalImage($url, $pageId);
+                }
             }
             return $journalWithPage;
         } catch (Exception $e) {
@@ -318,28 +350,28 @@ class JournalService
      * @param int $journalId The ID of the journal.
      *
      */
-    private function processHtmlContent(string $htmlContent, array $uploadedImages, int $journalId)
-    {
-        try {
-            // Create a new DOMDocument instance to parse the HTML
-            $dom = new DOMDocument();
-            libxml_use_internal_errors(true); // Prevents errors from malformed HTML
-            $dom->loadHTML($htmlContent); // Load the content directly, no need to wrap with <html> and <body>
-            libxml_clear_errors(); // Clear any libxml errors
+    // private function processHtmlContent(string $htmlContent, array $uploadedImages, int $journalId)
+    // {
+    //     try {
+    //         // Create a new DOMDocument instance to parse the HTML
+    //         $dom = new DOMDocument();
+    //         libxml_use_internal_errors(true); // Prevents errors from malformed HTML
+    //         $dom->loadHTML($htmlContent); // Load the content directly, no need to wrap with <html> and <body>
+    //         libxml_clear_errors(); // Clear any libxml errors
 
-            // Replace image sources with uploaded images
-            $imageurl = $this->processImagesInHtml($dom, $uploadedImages, $journalId);
+    //         // Replace image sources with uploaded images
+    //         $imageurl = $this->processImagesInHtml($dom, $uploadedImages, $journalId);
 
-            // After processing all images, get the content inside the <body> tag directly
-            $updatedHtmlContent = $this->extractBodyContent($dom);
+    //         // After processing all images, get the content inside the <body> tag directly
+    //         $updatedHtmlContent = $this->extractBodyContent($dom);
 
-            // Replace escaped double quotes with single quotes in the `src` attributes
-            return [$this->replaceDoubleQuotesWithSingle($updatedHtmlContent), $imageurl];
-        } catch (Exception $e) {
-            Log::error('JournalService::processHtmlContent', [$e->getMessage()]);
-            throw $e;
-        }
-    }
+    //         // Replace escaped double quotes with single quotes in the `src` attributes
+    //         return [$this->replaceDoubleQuotesWithSingle($updatedHtmlContent), $imageurl];
+    //     } catch (Exception $e) {
+    //         Log::error('JournalService::processHtmlContent', [$e->getMessage()]);
+    //         throw $e;
+    //     }
+    // }
 
 
     /**
@@ -349,40 +381,40 @@ class JournalService
      * @param array $uploadedImages The array of uploaded images.
      * @param int $journalId The ID of the journal.
      */
-    private function processImagesInHtml(DOMDocument $dom, array $uploadedImages, int $journalId)
-    {
-        try {
-            $images = $dom->getElementsByTagName('img');
-            $imageIndex = 0;
-            $totalImages = count($uploadedImages);
+    // private function processImagesInHtml(DOMDocument $dom, array $uploadedImages, int $journalId)
+    // {
+    //     try {
+    //         $images = $dom->getElementsByTagName('img');
+    //         $imageIndex = 0;
+    //         $totalImages = count($uploadedImages);
 
-            $imageUrl = [];
+    //         $imageUrl = [];
 
-            // Loop through each <img> tag and each uploaded image
-            foreach ($images as $img) {
-                if ($imageIndex < $totalImages) {
-                    // Get the current image file
-                    $file = $uploadedImages[$imageIndex];
+    //         // Loop through each <img> tag and each uploaded image
+    //         foreach ($images as $img) {
+    //             if ($imageIndex < $totalImages) {
+    //                 // Get the current image file
+    //                 $file = $uploadedImages[$imageIndex];
 
-                    if ($file && $file instanceof UploadedFile) {
-                        // Store the image in the journal's folder
-                        $imageName = $file->store('journal/' . $journalId, 'public');
+    //                 if ($file && $file instanceof UploadedFile) {
+    //                     // Store the image in the journal's folder
+    //                     $imageName = $file->store('journal/' . $journalId, 'public');
 
-                        // Update the image src in the HTML content
-                        $img->setAttribute('src', asset('storage/' . $imageName));
-                        $imageUrl[] = $imageName;
+    //                     // Update the image src in the HTML content
+    //                     $img->setAttribute('src', asset('storage/' . $imageName));
+    //                     $imageUrl[] = $imageName;
 
-                        // Move to the next image in the array
-                        $imageIndex++;
-                    }
-                }
-            }
-            return $imageUrl;
-        } catch (Exception $e) {
-            Log::error('JournalService::processImagesInHtml', [$e->getMessage()]);
-            throw $e;
-        }
-    }
+    //                     // Move to the next image in the array
+    //                     $imageIndex++;
+    //                 }
+    //             }
+    //         }
+    //         return $imageUrl;
+    //     } catch (Exception $e) {
+    //         Log::error('JournalService::processImagesInHtml', [$e->getMessage()]);
+    //         throw $e;
+    //     }
+    // }
 
 
     /**
@@ -392,23 +424,23 @@ class JournalService
      *
      * @return string The extracted body content as a string.
      */
-    private function extractBodyContent(DOMDocument $dom): string
-    {
-        try {
-            $updatedHtmlContent = '';
-            foreach ($dom->documentElement->childNodes as $node) {
-                if ($node->nodeName === 'body') {
-                    foreach ($node->childNodes as $child) {
-                        $updatedHtmlContent .= $dom->saveHTML($child);
-                    }
-                }
-            }
-            return $updatedHtmlContent;
-        } catch (Exception $e) {
-            Log::error('JournalService::extractBodyContent', [$e->getMessage()]);
-            throw $e;
-        }
-    }
+    // private function extractBodyContent(DOMDocument $dom): string
+    // {
+    //     try {
+    //         $updatedHtmlContent = '';
+    //         foreach ($dom->documentElement->childNodes as $node) {
+    //             if ($node->nodeName === 'body') {
+    //                 foreach ($node->childNodes as $child) {
+    //                     $updatedHtmlContent .= $dom->saveHTML($child);
+    //                 }
+    //             }
+    //         }
+    //         return $updatedHtmlContent;
+    //     } catch (Exception $e) {
+    //         Log::error('JournalService::extractBodyContent', [$e->getMessage()]);
+    //         throw $e;
+    //     }
+    // }
 
 
     /**
@@ -418,19 +450,26 @@ class JournalService
      *
      * @return string The updated HTML content with replaced quotes and removed whitespace.
      */
-    private function replaceDoubleQuotesWithSingle(string $htmlContent): string
-    {
-        try {
-            $htmlContent = preg_replace('/src=\\"(.*?)\\"/', "src='$1'", $htmlContent);
-            return str_replace(["\n", "\r", "\t"], '', $htmlContent);
-        } catch (Exception $e) {
-            Log::error('JournalService::replaceDoubleQuotesWithSingle', [$e->getMessage()]);
-            throw $e;
-        }
-    }
+    // private function replaceDoubleQuotesWithSingle(string $htmlContent): string
+    // {
+    //     try {
+    //         $htmlContent = preg_replace('/src=\\"(.*?)\\"/', "src='$1'", $htmlContent);
+    //         return str_replace(["\n", "\r", "\t"], '', $htmlContent);
+    //     } catch (Exception $e) {
+    //         Log::error('JournalService::replaceDoubleQuotesWithSingle', [$e->getMessage()]);
+    //         throw $e;
+    //     }
+    // }
 
 
-    public function store($content)
+    /**
+     * Formats the given content into HTML and processes images for storage.
+     *
+     * @param array|string $content The content to be formatted, expected as an array.
+     * @param int $journalId The ID of the journal associated with the content.
+     * @return array Returns an array containing the formatted HTML output and the list of stored image paths.
+     */
+    public function htmlFormat($content, $journalId)
     {
         if (!is_array($content)) {
             Log::error('JournalService::store - Invalid content received', ['content' => $content]);
@@ -445,23 +484,29 @@ class JournalService
 
         foreach ($content as $item) {
             if (isset($item['insert']['_type']) && $item['insert']['_type'] === 'image') {
-                $imagePath = $this->saveImage($item['insert']['source']);
+                $imagePath = $this->saveImage($item['insert']['source'], $journalId);
                 $htmlOutput .= "<img src='" . asset('storage/' . $imagePath) . "'>";
                 $imagePaths[] = $imagePath;
             } elseif (isset($item['insert']) && is_string($item['insert'])) {
                 $htmlOutput .= $this->formatText($item['insert'], $item['attributes'] ?? []);
             }
         }
-
         return [
-            'status' => 'success',
-            'html' => $htmlOutput,
-            'image_paths' => $imagePaths
+            $htmlOutput,
+            $imagePaths
         ];
     }
 
 
-    private function saveImage($filePath)
+
+    /**
+     * Saves an image to the storage directory for a specific journal.
+     *
+     * @param string $filePath The path of the image to be saved.
+     * @param int $journalId The ID of the journal associated with the image.
+     * @return string|null The stored image path or null if the file does not exist.
+     */
+    private function saveImage($filePath, $journalId)
     {
         if (!file_exists($filePath)) {
             return null;
@@ -469,17 +514,24 @@ class JournalService
 
         $imageData = file_get_contents($filePath);
         $filename = uniqid() . '.jpg';
-        Storage::disk('public')->put('uploads/' . $filename, $imageData);
+        Storage::disk('public')->put('uploads/' . $journalId . '/' . $filename, $imageData);
         return 'uploads/' . $filename;
     }
 
+
+    /**
+     * Formats text with given attributes into HTML.
+     *
+     * @param string $text The text content to be formatted.
+     * @param array $attributes An associative array of text formatting attributes (e.g., bold, italic, heading levels).
+     * @return string The formatted HTML string.
+     */
     private function formatText($text, $attributes)
     {
         $html = htmlentities($text);
 
         // Handle heading levels (h1 - h6)
-        if (isset($attributes['h']) && in_array($attributes['h'], [1, 2, 3, 4, 5, 6]))
-        {
+        if (isset($attributes['h']) && in_array($attributes['h'], [1, 2, 3, 4, 5, 6])) {
             $html = "<h{$attributes['h']}>$html</h{$attributes['h']}>";
         } else {
             // Default to paragraph if no heading is specified
