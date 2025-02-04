@@ -28,8 +28,6 @@ class CreateJournalPageRequest extends FormRequest
         return [
             'journal_id' => 'required|exists:journals,id',
             'content' => 'required|string',
-            'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp',
         ];
     }
 
@@ -46,9 +44,6 @@ class CreateJournalPageRequest extends FormRequest
             'journal_id.exists' => 'The selected journal ID does not exist in our records.',
             'content.required' => 'Please provide content for the journal entry.',
             'content.string' => 'The content must be a valid string.',
-            'images.array' => 'The images field must be an array.',
-            'images.*.image' => 'Each image must be a valid image file.',
-            'images.*.mimes' => 'Each image must be of type: jpeg, png, jpg, gif, svg, or webp.',
         ];
     }
 
@@ -71,7 +66,7 @@ class CreateJournalPageRequest extends FormRequest
     {
         $errors = $validator->errors()->getMessages();
         $message = null;
-        $fields = ['journal_id', 'content', 'images'];
+        $fields = ['journal_id', 'content'];
 
         foreach ($fields as $field) {
             if (isset($errors[$field])) {
