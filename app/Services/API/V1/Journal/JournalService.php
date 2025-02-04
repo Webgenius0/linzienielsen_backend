@@ -107,6 +107,19 @@ class JournalService
     }
 
 
+
+    /**
+     * Creates a new journal, processes its content, and stores related data.
+     *
+     * This function handles the creation of a journal, including saving the journal's title,
+     * associating it with a user, creating a journal notification, formatting the content into HTML,
+     * processing any images, and creating a journal page with the formatted content.
+     * If any step fails, the transaction is rolled back.
+     *
+     * @param array $credentials The journal creation data, including the title and content.
+     * @return mixed The created journal page with the formatted content.
+     * @throws Exception If an error occurs during the process, the exception is thrown after rolling back the transaction.
+     */
     public function createJournal(array $credentials)
     {
         try {
@@ -224,7 +237,17 @@ class JournalService
     }
 
 
-
+    /**
+     * Searches for journals by title for the authenticated user.
+     *
+     * This function queries the journal repository for journals that match the given title
+     * and are associated with the currently authenticated user. If an error occurs during
+     * the search, it logs the error and throws an exception.
+     *
+     * @param string $title The title or partial title to search for.
+     * @return mixed The list of journals matching the search criteria.
+     * @throws Exception If an error occurs during the search process, the exception is thrown.
+     */
     public function searchJournal($title)
     {
         try {
