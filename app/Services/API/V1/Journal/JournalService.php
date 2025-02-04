@@ -2,7 +2,6 @@
 
 namespace App\Services\API\V1\Journal;
 
-use App\Models\Image;
 use App\Models\Journal;
 use App\Models\JournalPage;
 use App\Repositories\API\V1\Journal\JournalRepositoryInterface;
@@ -180,28 +179,28 @@ class JournalService
      * @param array $credentials The credentials containing content, images, and journal ID.
      * @throws Exception If an error occurs during the journal page creation process.
      */
-    // public function createJournalPage(array $credentials)
-    // {
-    //     try {
-    //         DB::beginTransaction();
+    public function createJournalPage(array $credentials)
+    {
+        try {
+            DB::beginTransaction();
 
-    //         $response = $this->processHtmlContent($credentials['content'], $credentials['images'], $credentials['journal_id']);
+            $response = $this->htmlFormat($credentials['content'], $credentials['journal_id']);
 
-    //         // Get and process the HTML content
-    //         $htmlContent = $response[0];
-    //         $imageUrl = $response[1];
+            // Get and process the HTML content
+            $htmlContent = $response[0];
+            $imageUrl = $response[1];
 
-    //         // Create a new journal page with the updated HTML content
-    //         $journalWithPage = $this->createPage($htmlContent, $imageUrl, $credentials['journal_id']);
-    //         DB::commit();
+            // Create a new journal page with the updated HTML content
+            $journalWithPage = $this->createPage($htmlContent, $imageUrl, $credentials['journal_id']);
+            DB::commit();
 
-    //         return $journalWithPage;
-    //     } catch (Exception $e) {
-    //         DB::rollBack();
-    //         Log::error('JournalService::createJournalPage', [$e->getMessage()]);
-    //         throw $e;
-    //     }
-    // }
+            return $journalWithPage;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('JournalService::createJournalPage', [$e->getMessage()]);
+            throw $e;
+        }
+    }
 
 
     /**
