@@ -11,6 +11,7 @@ use DOMDocument;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -426,5 +427,65 @@ class JournalService
             Log::error('JournalService::replaceDoubleQuotesWithSingle', [$e->getMessage()]);
             throw $e;
         }
+    }
+
+
+    public function store($content)
+    {
+        $htmlOutput = '';
+        $imagePaths = [];
+
+        foreach ($content as $item) {
+            if (isset($item['insert']['_type']) && $item['insert']['_type'] === 'image') {
+                // Handle image upload
+                $imagePath = $this->saveImage($item['insert']['source']);
+                $htmlOutput .= '<img src="' . asset('storage/' . $imagePath) . '" alt="uploaded image">';
+                $imagePaths[] = $imagePath;
+            } elseif (isset($item['insert']) && is_string($item['insert'])) {
+                // Handle formatted text
+                $htmlOutput .= $this->formatText($item['insert'], $item['attributes'] ?? []);
+            }
+        }
+
+        return [
+            'status' => 'success',
+            'html' => $htmlOutput,
+            'image_paths' => $imagePaths
+        ];
+    }
+
+    private function saveImage($filePath)
+    {
+        if (!file_exists($filePath)) {
+            return null;
+        }
+
+        $imageData = file_get_contents($filePath);
+        $filename = uniqid() . '.jpg';
+        Storage::disk('public')->put('uploads/' . $filename, $imageData);
+        return 'uploads/' . $filename;
+    }
+
+    private function formatText($text, $attributes)
+    {
+        $html = htmlentities($text);
+
+        // Handle heading levels (h1 - h6)
+        if (isset($attributes['h']) && in_array($attributes['h'], [1, 2, 3, 4, 5, 6])) {
+            $html = "<h{$attributes['h']}>$html</h{$attributes['h']}>";
+        } else {
+            // Default to paragraph if no heading is specified
+            $html = "<p>$html</p>";
+        }
+
+        // Apply other text styles
+        if (isset($attributes['b'])) $html = "<b>$html</b>";
+        if (isset($attributes['i'])) $html = "<i>$html</i>";
+        if (isset($attributes['u'])) $html = "<u>$html</u>";
+        if (isset($attributes['s'])) $html = "<s>$html</s>";
+        if (isset($attributes['color'])) $html = "<span style='color: {$attributes['color']}'>$html</span>";
+        if (isset($attributes['size'])) $html = "<span style='font-size: {$attributes['size']}px'>$html</span>";
+
+        return $html;
     }
 }
