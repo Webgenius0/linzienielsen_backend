@@ -75,7 +75,7 @@ class CreateJournalRequest extends FormRequest
     {
         $errors = $validator->errors()->getMessages();
         $message = null;
-        $fields = ['title', 'content', 'reminder_type', 'reminder_time'];
+        $fields = ['title', 'content', 'reminder_type', 'reminder_time',  'images', 'images.*'];
 
         foreach ($fields as $field) {
             if (isset($errors[$field])) {

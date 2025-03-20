@@ -68,7 +68,7 @@ class CreateJournalPageRequest extends FormRequest
     {
         $errors = $validator->errors()->getMessages();
         $message = null;
-        $fields = ['journal_id', 'content', 'images'];
+        $fields = ['journal_id', 'content', 'images', 'images.*'];
 
         foreach ($fields as $field) {
             if (isset($errors[$field])) {
