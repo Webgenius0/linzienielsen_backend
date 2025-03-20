@@ -28,6 +28,8 @@ class CreateJournalRequest extends FormRequest
         return [
             'title' => 'required|string',
             'content' => 'required|array',
+            'images' => 'nullable|array',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10048',
             'reminder_type' => 'required|in:daily,weekly,monthly',
             'reminder_time' => 'required|date_format:H:i',
         ];

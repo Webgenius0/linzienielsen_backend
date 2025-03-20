@@ -28,6 +28,8 @@ class CreateJournalPageRequest extends FormRequest
         return [
             'journal_id' => 'required|exists:journals,id',
             'content' => 'required|array',
+            'images' => 'nullable|array',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10048',
         ];
     }
 
@@ -66,7 +68,7 @@ class CreateJournalPageRequest extends FormRequest
     {
         $errors = $validator->errors()->getMessages();
         $message = null;
-        $fields = ['journal_id', 'content'];
+        $fields = ['journal_id', 'content', 'images'];
 
         foreach ($fields as $field) {
             if (isset($errors[$field])) {
