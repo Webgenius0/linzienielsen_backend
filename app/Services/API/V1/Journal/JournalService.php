@@ -6,6 +6,7 @@ use App\Helpers\Helper;
 use App\Models\Journal;
 use App\Models\JournalPage;
 use App\Repositories\API\V1\Journal\JournalRepositoryInterface;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use DOMDocument;
@@ -334,6 +335,7 @@ class JournalService
             return $journalWithPage;
         } catch (Exception $e) {
             Log::error('JournalService::createPage', [$e->getMessage()]);
+            throw $e;
         }
     }
 
@@ -423,5 +425,41 @@ class JournalService
         if (isset($attributes['size'])) $html = "<span style='font-size: {$attributes['size']}px'>$html</span>";
 
         return $html;
+    }
+
+    /**
+     * generatePDF
+     * @param \App\Models\Journal $journal
+     * @return array{cover_url: string, pdf_url: string, total_pages: int}
+     */
+    public function generatePDF(Journal $journal)
+    {
+        try {
+            $pdf = Pdf::loadView('journal.pdf', compact('journal'));
+            $cover = Pdf::loadView('journal.cover', compact('journal'));
+
+            $pdf->setPaper('A4', 'portrait');
+            $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
+
+            $pdfPath = 'journal_pdfs/' . $journal->id . '.pdf';
+            Storage::disk('public')->put($pdfPath, $pdf->output());
+            $coverPath = 'journal_pdfs/' . $journal->id . '_cover.pdf';
+            Storage::disk('public')->put($coverPath, $cover->output());
+
+            // Get the total page count
+            $dompdf = $pdf->getDomPDF();
+            $canvas = $dompdf->get_canvas();
+            $pageCount = $canvas->get_page_count();
+
+
+            return [
+                'cover_url' => asset('storage/' . $coverPath),
+                'pdf_url' => asset('storage/' . $pdfPath),
+                'total_pages' => $pageCount
+            ];
+        } catch (Exception $e) {
+            Log::error('JournalService::generatePDF', [$e->getMessage()]);
+            throw $e;
+        }
     }
 }

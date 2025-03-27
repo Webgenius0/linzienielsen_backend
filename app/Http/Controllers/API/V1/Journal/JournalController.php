@@ -8,11 +8,13 @@ use App\Http\Requests\API\V1\Journal\JournalArchiveRequest;
 use App\Models\Journal;
 use App\Services\API\V1\Journal\JournalService;
 use App\Traits\V1\ApiResponse;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class JournalController extends Controller
@@ -155,4 +157,19 @@ class JournalController extends Controller
         }
     }
 
+    /**
+     * generatePDF
+     * @param \App\Models\Journal $journal
+     * @return JsonResponse
+     */
+    public function generatePDF(Journal $journal)
+    {
+        try {
+            $response = $this->journalService->generatePDF($journal);
+            return $this->success(200,'Success', $response);
+        } catch (Exception $e) {
+            Log::error('JournalController::generatePDF', [$e->getMessage()]);
+            return $this->error(500, 'Server Error', $e->getMessage());
+        }
+    }
 }
