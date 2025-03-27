@@ -16,8 +16,6 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('title');
             $table->boolean('archive')->default(false);
-            $table->string('cover_link')->default(null)->nullable();
-            $table->string('journal_link')->default(null)->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

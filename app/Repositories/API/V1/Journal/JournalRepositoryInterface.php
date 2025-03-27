@@ -125,12 +125,4 @@ interface JournalRepositoryInterface
      */
     public function searchJournalByTitle(string $title, int $userId);
 
-    /**
-     * storeJournalLinks
-     * @param int $journalId
-     * @param string $cover
-     * @param string $page
-     * @return void
-     */
-    public function storeJournalLinks(int $journalId, string $cover, string $page);
 }
