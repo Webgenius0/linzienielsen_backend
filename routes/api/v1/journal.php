@@ -13,6 +13,7 @@ Route::controller(JournalController::class)->group(function () {
     Route::post('/archive', 'toggleArchive')->name('archive');
     Route::get('/search', 'search')->name('search');
     Route::delete('/destroy', 'destroy')->name('destroy');
+    Route::get('/{journal}/pdf', 'generatePDF')->name('journal.pdf');
 });
 
 
@@ -22,3 +23,6 @@ Route::prefix('/page')->name('page.')->controller(JournalPageController::class)-
     Route::get('/show', 'show')->name('show');
     Route::delete('/destroy', 'destroy')->name('destroy');
 });
+
+//generate pdf
+Route::get('/{journal}/pdf', [JournalController::class, 'generatePDF'])->name('journal.pdf');

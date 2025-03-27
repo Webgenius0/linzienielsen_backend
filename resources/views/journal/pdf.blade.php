@@ -29,6 +29,7 @@
 
     @foreach ($journal->journalPages as $page)
         <div class="journal-page">
+            {{$page->created_at}}
             {!! str_replace(['\n', '\r'], '', $page->content) !!}
         </div>
     @endforeach
