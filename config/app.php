@@ -123,4 +123,12 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+
+    'lulu' => [
+        'key' => env('LULU_CLIENT_KEY'),
+        'secret' => env('LULU_CLIENT_SECRET'),
+        'auth_url' => env('LULU_AUTH_URL', 'https://api.lulu.com/auth/realms/glasstree/protocol/openid-connect/token'),
+        'print_job' => env('LULU_PRINT_JOB_URL', 'https://api.lulu.com/print-jobs/'),
+    ],
+
 ];
