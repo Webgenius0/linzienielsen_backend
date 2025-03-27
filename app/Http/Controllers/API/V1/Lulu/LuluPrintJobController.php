@@ -11,7 +11,7 @@ class LuluPrintJobController extends Controller
     public function createPrintJob()
     {
         $printJobData = [
-            "contact_email" => "test@test.com",
+            "contact_email" => "linzie@test.com",
             "external_id" => "demo-time",
             "line_items" => [
                 [
@@ -25,8 +25,8 @@ class LuluPrintJobController extends Controller
                         ],
                         "pod_package_id" => "0600X0900BWSTDPB060UW444MXX"
                     ],
-                    "quantity" => 30,
-                    "title" => "My Book"
+                    "quantity" => 1,
+                    "title" => "Linzie Journal"
                 ]
             ],
             "production_delay" => 120,

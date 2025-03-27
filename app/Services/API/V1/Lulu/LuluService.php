@@ -18,7 +18,7 @@ class LuluService
             return $response->json()['access_token'];
         }
 
-        return null; // Handle errors properly
+        return null;
     }
 
     public static function createPrintJob($printJobData)
