@@ -162,7 +162,7 @@ class JournalController extends Controller
      * @param \App\Models\Journal $journal
      * @return JsonResponse
      */
-    public function generatePDF(Journal $journal)
+    public function generatePDF(Journal $journal): JsonResponse
     {
         try {
             $response = $this->journalService->generatePDF($journal);
