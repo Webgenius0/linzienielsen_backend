@@ -296,4 +296,25 @@ class JournalRepository implements JournalRepositoryInterface
             throw $e;
         }
     }
+
+
+    /**
+     * storeJournalLinks
+     * @param int $journalId
+     * @param string $cover
+     * @param string $page
+     * @return void
+     */
+    public function storeJournalLinks(int $journalId, string $cover, string $page)
+    {
+        try {
+            $journal = Journal::findOrFail($journalId);
+            $journal->cover_link = $cover;
+            $journal->journal_link = $page;
+            $journal->save();
+        } catch (Exception $e) {
+            Log::error('JournalRepository::storeJournalLinks', [$e->getMessage()]);
+            throw $e;
+        }
+    }
 }
