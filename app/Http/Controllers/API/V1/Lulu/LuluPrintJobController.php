@@ -18,10 +18,10 @@ class LuluPrintJobController extends Controller
                     "external_id" => "item-reference-1",
                     "printable_normalization" => [
                         "cover" => [
-                            "source_url" => "https://www.dropbox.com/s/7bv6mg2tj0h3l0r/lulu_trade_perfect_template.pdf?dl=1&raw=1"
+                            "source_url" => "https://linzienielsen.softvencefsd.xyz/storage/journal_pdfs/1_cover.pdf"
                         ],
                         "interior" => [
-                            "source_url" => "https://www.dropbox.com/s/r20orb8umqjzav9/lulu_trade_interior_template-32.pdf?dl=1&raw=1"
+                            "source_url" => "https://linzienielsen.softvencefsd.xyz/storage/journal_pdfs/1.pdf"
                         ],
                         "pod_package_id" => "0600X0900BWSTDPB060UW444MXX"
                     ],
@@ -31,13 +31,13 @@ class LuluPrintJobController extends Controller
             ],
             "production_delay" => 120,
             "shipping_address" => [
-                "city" => "Lübeck",
-                "country_code" => "GB",
-                "name" => "Hans Dampf",
-                "phone_number" => "844-212-0689",
-                "postcode" => "PO1 3AX",
-                "state_code" => "",
-                "street1" => "Holstenstr. 48"
+                "city" => "New York",
+                "country_code" => "US",
+                "name" => "Jane Doe",
+                "phone_number" => "212-555-1234",
+                "postcode" => "10001",
+                "state_code" => "NY",
+                "street1" => "350 5th Ave"
             ],
             "shipping_level" => "MAIL"
         ];
