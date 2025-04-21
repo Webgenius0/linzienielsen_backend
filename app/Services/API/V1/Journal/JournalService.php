@@ -435,12 +435,18 @@ class JournalService
     public function generatePDF(Journal $journal)
     {
         try {
+            // Generate the interior PDF
             $pdf = Pdf::loadView('journal.pdf', compact('journal'));
             $cover = Pdf::loadView('journal.cover', compact('journal'));
 
-            $pdf->setPaper('A4', 'portrait');
+            // Set the paper size to 6" x 9" (in points: 1 inch = 72 points)
+            $pdf->setPaper([0, 0, 6 * 72, 9 * 72], 'portrait');  // 6" x 9"
+            $cover->setPaper([0, 0, 6 * 72, 9 * 72], 'portrait');  // 6" x 9"
+
+            // Enable remote resources for any external URLs
             $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
 
+            // Save the generated PDFs
             $pdfPath = 'journal_pdfs/' . $journal->id . '.pdf';
             Storage::disk('public')->put($pdfPath, $pdf->output());
             $coverPath = 'journal_pdfs/' . $journal->id . '_cover.pdf';
@@ -450,7 +456,6 @@ class JournalService
             $dompdf = $pdf->getDomPDF();
             $canvas = $dompdf->get_canvas();
             $pageCount = $canvas->get_page_count();
-
 
             return [
                 'cover_url' => asset('storage/' . $coverPath),
@@ -462,4 +467,5 @@ class JournalService
             throw $e;
         }
     }
+
 }
