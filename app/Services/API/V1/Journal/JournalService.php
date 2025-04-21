@@ -439,10 +439,20 @@ class JournalService
             $pdf = Pdf::loadView('journal.pdf', compact('journal'));
             $cover = Pdf::loadView('journal.cover', compact('journal'));
 
-            $pdf->setPaper([0, 0, 432, 648], 'portrait');
-            $cover->setPaper([0, 0, 898.56, 666], 'portrait');
+            // Set dimensions to meet requirements (12.385"-12.510" x 9.188"-9.312")
+            // Using middle values: 12.4475" x 9.25"
+            // Convert inches to points (1 inch = 72 points)
+            $interiorWidth = 12.4475 * 72;  // ~896.22 points
+            $interiorHeight = 9.25 * 72;     // 666 points
+
+            $coverWidth = 12.4475 * 72 * 2;  // Cover needs to be double width for front + back + spine
+            $coverHeight = 9.25 * 72;        // 666 points
+
+            $pdf->setPaper([0, 0, $interiorWidth, $interiorHeight], 'portrait');
+            $cover->setPaper([0, 0, $coverWidth, $coverHeight], 'portrait');
 
             $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
+            $cover->getDomPDF()->set_option("isRemoteEnabled", true);
 
             // Save the generated PDFs
             $pdfPath = 'journal_pdfs/' . $journal->id . '.pdf';
