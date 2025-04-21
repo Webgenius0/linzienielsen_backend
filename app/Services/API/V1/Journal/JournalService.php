@@ -433,44 +433,44 @@ class JournalService
      * @return array{cover_url: string, pdf_url: string, total_pages: int}
      */
     public function generatePDF(Journal $journal)
-{
-    try {
-        // Generate the interior PDF
-        $pdf = Pdf::loadView('journal.pdf', compact('journal'));
-        $cover = Pdf::loadView('journal.cover', compact('journal'));
+    {
+        try {
+            // Generate the interior PDF
+            $pdf = Pdf::loadView('journal.pdf', compact('journal'));
+            $cover = Pdf::loadView('journal.cover', compact('journal'));
 
-        // Set dimensions to 6" x 9" (convert inches to points: 1 inch = 72 points)
-        $interiorWidth = 6 * 72;
-        $interiorHeight = 9 * 72;
+            // Set dimensions to 6" x 9" (convert inches to points: 1 inch = 72 points)
+            $interiorWidth = 6 * 72;
+            $interiorHeight = 9 * 72;
 
-        $coverWidth = 6 * 72;
-        $coverHeight = 9 * 72;
+            $coverWidth = 6 * 72;
+            $coverHeight = 9 * 72;
 
-        $pdf->setPaper([0, 0, $interiorWidth, $interiorHeight], 'portrait');
-        $cover->setPaper([0, 0, $coverWidth, $coverHeight], 'portrait');
+            $pdf->setPaper([0, 0, $interiorWidth, $interiorHeight], 'portrait');
+            $cover->setPaper([0, 0, $coverWidth, $coverHeight], 'portrait');
 
-        $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
-        $cover->getDomPDF()->set_option("isRemoteEnabled", true);
+            $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
+            $cover->getDomPDF()->set_option("isRemoteEnabled", true);
 
-        // Save the generated PDFs
-        $pdfPath = 'journal_pdfs/' . $journal->id . '.pdf';
-        Storage::disk('public')->put($pdfPath, $pdf->output());
-        $coverPath = 'journal_pdfs/' . $journal->id . '_cover.pdf';
-        Storage::disk('public')->put($coverPath, $cover->output());
+            // Save the generated PDFs
+            $pdfPath = 'journal_pdfs/' . $journal->id . '.pdf';
+            Storage::disk('public')->put($pdfPath, $pdf->output());
+            $coverPath = 'journal_pdfs/' . $journal->id . '_cover.pdf';
+            Storage::disk('public')->put($coverPath, $cover->output());
 
-        // Get the total page count
-        $dompdf = $pdf->getDomPDF();
-        $canvas = $dompdf->get_canvas();
-        $pageCount = $canvas->get_page_count();
+            // Get the total page count
+            $dompdf = $pdf->getDomPDF();
+            $canvas = $dompdf->get_canvas();
+            $pageCount = $canvas->get_page_count();
 
-        return [
-            'cover_url' => asset('storage/' . $coverPath),
-            'pdf_url' => asset('storage/' . $pdfPath),
-            'total_pages' => $pageCount
-        ];
-    } catch (Exception $e) {
-        Log::error('JournalService::generatePDF', [$e->getMessage()]);
-        throw $e;
+            return [
+                'cover_url' => asset('storage/' . $coverPath),
+                'pdf_url' => asset('storage/' . $pdfPath),
+                'total_pages' => $pageCount
+            ];
+        } catch (Exception $e) {
+            Log::error('JournalService::generatePDF', [$e->getMessage()]);
+            throw $e;
+        }
     }
-}
 }
