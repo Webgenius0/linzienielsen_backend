@@ -467,5 +467,4 @@ class JournalService
             throw $e;
         }
     }
-
 }
