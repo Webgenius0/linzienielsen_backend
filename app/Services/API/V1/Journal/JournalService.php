@@ -440,7 +440,7 @@ class JournalService
             $cover = Pdf::loadView('journal.cover', compact('journal'));
 
             $pdf->setPaper([0, 0, 432, 648], 'portrait');
-            $cover->setPaper([0, 0, 432, 648], 'portrait');
+            $cover->setPaper([0, 0, 898.56, 666], 'portrait');
 
             $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
 
