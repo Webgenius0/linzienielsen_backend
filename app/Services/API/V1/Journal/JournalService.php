@@ -440,15 +440,11 @@ class JournalService
         $cover = Pdf::loadView('journal.cover', compact('journal'));
 
         // Set dimensions to 6" x 9" (convert inches to points: 1 inch = 72 points)
-        $interiorWidth = 6 * 72;  // 432 points
-        $interiorHeight = 9 * 72; // 648 points
+        $interiorWidth = 6 * 72;
+        $interiorHeight = 9 * 72;
 
-        // Cover dimensions:
-        // Width = (back width + spine width + front width)
-        // Height = same as interior (with bleed if needed)
-        // For a basic cover without spine calculation, we'll use double width
-        $coverWidth = (6 * 2) * 72;  // 864 points (front + back, no spine)
-        $coverHeight = 9 * 72;       // 648 points
+        $coverWidth = 6 * 72;
+        $coverHeight = 9 * 72;
 
         $pdf->setPaper([0, 0, $interiorWidth, $interiorHeight], 'portrait');
         $cover->setPaper([0, 0, $coverWidth, $coverHeight], 'portrait');
