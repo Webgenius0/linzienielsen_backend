@@ -439,10 +439,9 @@ class JournalService
             $pdf = Pdf::loadView('journal.pdf', compact('journal'));
             $cover = Pdf::loadView('journal.cover', compact('journal'));
 
-            // Set the paper size to 6" x 9" (in points: 1 inch = 72 points)
-            $pdf->setPaper([0, 0, 12.5 * 72, 9.25 * 72], 'portrait');  // 12.5" x 9.25"
-            $cover->setPaper([0, 0, 12.5 * 72, 9.25 * 72], 'portrait');
-            // Enable remote resources for any external URLs
+            $pdf->setPaper([0, 0, 432, 648], 'portrait');
+            $cover->setPaper([0, 0, 432, 648], 'portrait');
+
             $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
 
             // Save the generated PDFs

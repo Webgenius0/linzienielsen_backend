@@ -23,7 +23,7 @@ class LuluPrintJobController extends Controller
                         "interior" => [
                             "source_url" => "https://linzienielsen.softvencefsd.xyz/storage/journal_pdfs/1.pdf"
                         ],
-                        "pod_package_id" => "0600X0900BWSTDPB060UW444MXX"
+                        "pod_package_id" => "0600X0900FCPREPB080CW444GXX"
                     ],
                     "quantity" => 1,
                     "title" => "Linzie Journal"
