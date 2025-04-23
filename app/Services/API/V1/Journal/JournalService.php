@@ -435,38 +435,53 @@ class JournalService
     public function generatePDF(Journal $journal)
     {
         try {
-            // Generate the interior PDF
+            // Step 1: Generate the interior PDF
             $pdf = Pdf::loadView('journal.pdf', compact('journal'));
-            $cover = Pdf::loadView('journal.cover', compact('journal'));
 
-            // Set dimensions to 6" x 9" (convert inches to points: 1 inch = 72 points)
+            // Set interior size: 6" x 9" in points
             $interiorWidth = 6 * 72;
             $interiorHeight = 9 * 72;
 
-            $coverWidth = 6 * 72;
-            $coverHeight = 9 * 72;
-
             $pdf->setPaper([0, 0, $interiorWidth, $interiorHeight], 'portrait');
-            $cover->setPaper([0, 0, $coverWidth, $coverHeight], 'portrait');
-
             $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
-            $cover->getDomPDF()->set_option("isRemoteEnabled", true);
 
-            // Save the generated PDFs
-            $pdfPath = 'journal_pdfs/' . $journal->id . '.pdf';
-            Storage::disk('public')->put($pdfPath, $pdf->output());
-            $coverPath = 'journal_pdfs/' . $journal->id . '_cover.pdf';
-            Storage::disk('public')->put($coverPath, $cover->output());
+            // Step 2: Save the interior PDF temporarily
+            $interiorPath = 'journal_pdfs/' . $journal->id . '.pdf';
+            Storage::disk('public')->put($interiorPath, $pdf->output());
 
-            // Get the total page count
+            // Step 3: Get total page count
             $dompdf = $pdf->getDomPDF();
             $canvas = $dompdf->get_canvas();
             $pageCount = $canvas->get_page_count();
 
+            // Step 4: Calculate cover dimensions based on page count
+            $frontBackWidthIn = 6.125;   // front and back cover width including bleed
+            $heightIn = 9.25;            // height with bleed
+            $spineIn = ($pageCount / 444) + 0.06;  // spine width formula
+
+            $totalWidthIn = (2 * $frontBackWidthIn) + $spineIn;
+
+            $coverWidth = $totalWidthIn * 72; // convert to points
+            $coverHeight = $heightIn * 72;
+
+            // Step 5: Generate the cover using the calculated dimensions
+            $cover = Pdf::loadView('journal.cover', compact('journal', 'spineIn', 'totalWidthIn', 'heightIn'));
+            $cover->setPaper([0, 0, $coverWidth, $coverHeight], 'portrait');
+            $cover->getDomPDF()->set_option("isRemoteEnabled", true);
+
+            $coverPath = 'journal_pdfs/' . $journal->id . '_cover.pdf';
+            Storage::disk('public')->put($coverPath, $cover->output());
+
+            // Step 6: Return results
             return [
                 'cover_url' => asset('storage/' . $coverPath),
-                'pdf_url' => asset('storage/' . $pdfPath),
-                'total_pages' => $pageCount
+                'pdf_url' => asset('storage/' . $interiorPath),
+                'total_pages' => $pageCount,
+                'spine_inches' => round($spineIn, 3),
+                'cover_dimensions_inches' => [
+                    'width' => round($totalWidthIn, 3),
+                    'height' => round($heightIn, 3)
+                ]
             ];
         } catch (Exception $e) {
             Log::error('JournalService::generatePDF', [$e->getMessage()]);
