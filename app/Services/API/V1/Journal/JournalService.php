@@ -437,6 +437,7 @@ class JournalService
         try {
             // Step 1: Generate the interior PDF
             $pdf = Pdf::loadView('journal.pdf', compact('journal'));
+            $pdf->getDomPDF()->set_option("isFontSubsettingEnabled", true);
 
             // Set interior size: 6" x 9" in points
             $interiorWidth = 6 * 72;
@@ -467,6 +468,7 @@ class JournalService
             // Step 5: Generate the cover using the calculated dimensions
             $cover = Pdf::loadView('journal.cover', compact('journal', 'spineIn', 'totalWidthIn', 'heightIn'));
             $cover->setPaper([0, 0, $coverWidth, $coverHeight], 'portrait');
+            $cover->getDomPDF()->set_option("isFontSubsettingEnabled", true);
             $cover->getDomPDF()->set_option("isRemoteEnabled", true);
 
             $coverPath = 'journal_pdfs/' . $journal->id . '_cover.pdf';
