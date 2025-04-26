@@ -6,7 +6,7 @@
     <title>{{ $journal->title }}</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'DejaVu Sans', sans-serif;
         }
         .journal-title {
             text-align: center;
