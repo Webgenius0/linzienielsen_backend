@@ -447,7 +447,7 @@ class JournalService
             $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
 
             // Step 2: Save the interior PDF temporarily
-            $interiorPath = 'journal_pdfs/file' . $journal->id . '.pdf';
+            $interiorPath = 'journal_pdfs/' . $journal->id . '.pdf';
             Storage::disk('public')->put($interiorPath, $pdf->output());
 
             // Step 3: Get total page count
@@ -471,7 +471,7 @@ class JournalService
             $cover->getDomPDF()->set_option("isFontSubsettingEnabled", false);
             $cover->getDomPDF()->set_option("isRemoteEnabled", true);
 
-            $coverPath = 'journal_pdfs/cover_' . $journal->id . '_cover.pdf';
+            $coverPath = 'journal_pdfs/' . $journal->id . '_cover.pdf';
             Storage::disk('public')->put($coverPath, $cover->output());
 
             // Step 6: Return results
